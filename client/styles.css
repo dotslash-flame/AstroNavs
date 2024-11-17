@@ -22,12 +22,7 @@ body {
 
 canvas {
   border: 2px solid white;
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.8
-  );
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 #controls {
@@ -71,10 +66,22 @@ input {
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   font-size: 64px;
   z-index: 1000;
+
+  h1 {
+    text-align: center;
+  }
+
+  button {
+    cursor: pointer;
+    height: 56px;
+    padding: 12px;
+    font-size: 24px;
+  }
 
   .inner-overlay {
     display: flex;

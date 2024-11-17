@@ -321,7 +321,7 @@ function endGame(win) {
   const overlay = document.getElementById("overlay");
 
   if (overlay) {
-    overlay.style.display = "block"; // Show overlay
+    overlay.style.display = "flex"; // Show overlay
     overlay.innerHTML = win
       ? "<h1>You Survived! You Win!</h1>"
       : "<h1>Game Over! You Lost!</h1>";
