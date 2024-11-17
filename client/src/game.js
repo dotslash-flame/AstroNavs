@@ -8,6 +8,16 @@ canvas.height = 640;
 const gridSize = 16;
 const cellSize = canvas.width / gridSize;
 
+// Audio
+const bgMusic = new Audio("bg.mp3");
+const errorSound = new Audio("error.mp3");
+const wrongMoveSound = new Audio("wrong-move.mp3");
+const moveSounds = [new Audio("move.mp3"), new Audio("move-2.mp3")];
+const airstrikeSound = new Audio("airstrike.mp3");
+const airstrikeSoundNew = new Audio("airstrike-1.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.2;
+
 // Background Stars
 const starCount = 100;
 const stars = [];
