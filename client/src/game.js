@@ -18,6 +18,20 @@ let dangerousCells = [];
 let player = { x: 7, y: 7 };
 let gameOver = false;
 
+// Timing
+const gameDuration = 5 * 60; // 5 minutes
+const moveDurations = [60, 45, 45, 30, 30, 30, 30, 30];
+let currentMoveIndex = 0;
+let currentMoveTime = moveDurations[currentMoveIndex];
+let gameTimeRemaining = gameDuration;
+
+// Timer Display
+const timerDisplay = document.createElement("div");
+timerDisplay.style.color = "white";
+timerDisplay.style.fontSize = "20px";
+timerDisplay.style.marginTop = "10px";
+document.body.appendChild(timerDisplay);
+
 // Create Stars
 function createStars() {
   for (let i = 0; i < starCount; i++) {
@@ -74,6 +88,29 @@ function generateSafeCells(num = 5) {
   }
 }
 
+// Display Timer
+function drawTimer() {
+  if (gameTimeRemaining > 0 && currentMoveTime > 0) {
+    gameTimeRemaining -= 1 / 60;
+    currentMoveTime -= 1 / 60;
+  } else if (currentMoveIndex < moveDurations.length - 1) {
+    currentMoveIndex++;
+    currentMoveTime = moveDurations[currentMoveIndex];
+  } else {
+    console.log("game end");
+  }
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  timerDisplay.textContent = `Game Time: ${formatTime(
+    gameTimeRemaining
+  )} | Move Time: ${formatTime(currentMoveTime)}`;
+}
+
 // Create Player
 function drawPlayer() {
   const playerPosition = `${player.x}-${player.y}`;
@@ -92,6 +129,7 @@ function startGame() {
   drawStars();
   generateSafeCells();
   drawPlayer();
+  drawTimer();
 }
 
 document.getElementById("startButton").addEventListener("click", function () {
