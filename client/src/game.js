@@ -123,6 +123,55 @@ function drawPlayer() {
   ctx.shadowBlur = 0;
 }
 
+// Create Explosion
+function showExplosion(x, y) {
+  const centerX = x * cellSize + cellSize / 2;
+  const centerY = y * cellSize + cellSize / 2;
+  const maxRadius = cellSize * 3;
+  const duration = 1000;
+  const startTime = performance.now();
+
+  function animateExplosion(currentTime) {
+    const elapsed = currentTime - startTime;
+    if (elapsed > duration) return;
+
+    const progress = elapsed / duration;
+    const radius = maxRadius * progress;
+    const alpha = 1 - progress;
+
+    // Explosion in surrounding cells
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        // Avoid out-of-bounds)
+        const neighborX = x + dx;
+        const neighborY = y + dy;
+        if (
+          neighborX >= 0 &&
+          neighborY >= 0 &&
+          neighborX < gridSize &&
+          neighborY < gridSize
+        ) {
+          const distance = Math.sqrt(dx * dx + dy * dy); // Distance from cell center
+          if (distance <= progress) {
+            // Impact Radius
+            const offsetX = neighborX * cellSize + cellSize / 2;
+            const offsetY = neighborY * cellSize + cellSize / 2;
+            ctx.fillStyle = `rgba(255, 165, 0, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(offsetX, offsetY, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+    }
+
+    // Continue
+    requestAnimationFrame(animateExplosion);
+  }
+
+  requestAnimationFrame(animateExplosion);
+}
+
 // Start Game
 function startGame() {
   createStars();
