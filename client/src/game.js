@@ -305,6 +305,29 @@ function startGame() {
   const timerInterval = setInterval(updateTimer, 1000);
 }
 
+//  Fuck the game
+function endGame(win) {
+  if (gameOver) return; // Prevent running multiple times
+
+  gameOver = true;
+  bgMusic.pause(); // Stop background music
+  bgMusic.currentTime = 0; // Reset the music
+  const overlay = document.getElementById("overlay");
+
+  if (overlay) {
+    overlay.style.display = "block"; // Show overlay
+    overlay.innerHTML = win
+      ? "<h1>You Survived! You Win!</h1>"
+      : "<h1>Game Over! You Lost!</h1>";
+    overlay.innerHTML +=
+      '<button onclick="location.reload()">Restart Game</button>';
+  }
+
+  if (!win) {
+    airstrikeSound.play(); // Play airstrike sound if the player lost
+  }
+}
+
 document.getElementById("startButton").addEventListener("click", function () {
   const overlay = document.getElementById("overlay");
 
