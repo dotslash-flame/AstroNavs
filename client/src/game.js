@@ -8,6 +8,18 @@ canvas.height = 640;
 const gridSize = 16;
 const cellSize = canvas.width / gridSize;
 
+//TODO: make these inputtable by command line
+const game_room = "101"
+
+const serverAddress = "192.168.0.175"
+
+const serverPort = "5101"
+
+
+var isGameReady = false
+var isGameOver = false
+
+
 // Audio
 const bgMusic = new Audio("client/public/assets/audio/bg.mp3");
 const errorSound = new Audio("client/public/assets/audio/error.mp3");
@@ -87,12 +99,15 @@ function drawStars() {
 function generateSafeCells(num = 5) {
   safeCells = [];
   dangerousCells = [];
+  safeCoords = [];
 
   while (safeCells.length < num) {
     const x = Math.floor(Math.random() * gridSize);
     const y = Math.floor(Math.random() * gridSize);
     const safeCell = `${x}-${y}`;
     if (!safeCells.includes(safeCell)) safeCells.push(safeCell);
+
+    if(!safeCoords.includes((x, y))) safeCoords.push((x, y))
   }
 
   for (let x = 0; x < gridSize; x++) {
@@ -101,6 +116,34 @@ function generateSafeCells(num = 5) {
       if (!safeCells.includes(cellKey)) dangerousCells.push(cellKey);
     }
   }
+  sendSafeCoordinatesToServer(safeCoords)
+  isGameReady = false
+  waitGameStart()
+}
+
+async function sendSafeCoordinatesToServer(safeCoords){
+  if (safeCoords.length == 0)
+    return false
+  uri = `http://${serverAddress}:${serverPort}/add_safe_coordinates/${game_room}`
+  await fetch(uri, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/JSON'
+    },
+    body: JSON.stringify({
+      safe_coordinates : safeCoords
+    }),
+    credentials : 'include'
+  })
+  .then(response => {
+    if (response.ok){
+      return response.json()
+    }    
+    else {
+      console.error('Request failed with status:', response.status);
+      throw new Error('Failed to connect to server');
+    }
+  })
 }
 
 // Display Timer
@@ -334,12 +377,61 @@ function endGame(win) {
   }
 }
 
-document.getElementById("startButton").addEventListener("click", function () {
+// Very shitty design, ideally we don't let user click start game till it is ready
+async function waitGameStart(){
+  while (isGameReady === false) {
+    await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
+  }
+}
+
+async function connectToServer(){
+    uri = `http://${serverAddress}:${serverPort}/connect`
+    await fetch(uri, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/JSON'
+    },
+    body: JSON.stringify({
+        client: 'c',
+        game_room: game_room
+    }),
+  })
+  .then(response => {
+    if (response.ok){
+      return response.json()
+    }    
+    else {
+      console.error('Request failed with status:', response.status);
+      throw new Error('Failed to connect to server');
+    }
+  })
+}
+
+io = require("socket.io")
+const socket = io.connect(`http://${serverAddress}:${serverPort}`)
+
+socket.on('all_clients_ready', (data, ackCallBack) => {
+  ackCallBack("Acknowledged")
+  isGameReady = true
+  }
+)
+
+socket.on('game_start_c', (data, ackCallBack) => {
+  ackCallBack("Acknowledged")
+  isGameReady = true
+})
+
+document.getElementById("startButton").addEventListener("click", async function () {
   const overlay = document.getElementById("overlay");
 
   if (overlay) {
     overlay.style.display = "none";
   }
+
+  //TODO: Maybe add some loading thing between connect and wait game start
+  connectToServer()
+
+  await waitGameStart()
 
   startGame();
 });
