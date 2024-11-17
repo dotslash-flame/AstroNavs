@@ -214,13 +214,95 @@ function airStrike() {
   }
 }
 
+// Game Loop
+function gameLoop() {
+  if (!gameOver) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawStars();
+    // drawGrid();
+    drawPlayer();
+    drawTimer();
+    requestAnimationFrame(gameLoop);
+  }
+}
+
 // Start Game
 function startGame() {
   createStars();
-  drawStars();
   generateSafeCells();
-  drawPlayer();
-  drawTimer();
+  gameLoop();
+  bgMusic.play();
+
+  const totalGameDuration = 300; // 5 mins
+  const roundDurations = [60, 45, 45]; // First round: 60s, next two: 45s each
+  const defaultRoundDuration = 30; // All remaining rounds: 30s each
+  const timerElement = document.getElementById("timer");
+  const overlay = document.getElementById("overlay"); // Round change
+
+  let elapsedTime = 0;
+  let currentRound = 0;
+  let roundTimeLeft = roundDurations[currentRound] || defaultRoundDuration; // Initial round
+  let gameOver = false;
+
+  function showRoundOverlay(roundNumber) {
+    if (overlay && !gameOver) {
+      // Only show overlay if the game is not over
+      overlay.style.display = "block";
+      overlay.innerHTML = `<h1>Round ${roundNumber} Starting!</h1>`;
+      setTimeout(() => {
+        overlay.style.display = "none"; // Hide after 2sec
+      }, 2000);
+    }
+  }
+
+  function updateTimer() {
+    if (gameOver) return; // Stop the timer if game is over
+
+    if (timerElement) {
+      timerElement.textContent = `Round ${
+        currentRound + 1
+      }, Time: ${roundTimeLeft}s`;
+    }
+
+    if (roundTimeLeft <= 0) {
+      airStrike(); // Airstrike at the end of the round
+      currentRound++;
+
+      if (elapsedTime >= totalGameDuration) {
+        endGame(false); // End the game if time runs out
+        return;
+      }
+
+      const nextRoundDuration =
+        roundDurations[currentRound] || defaultRoundDuration;
+
+      if (elapsedTime + nextRoundDuration > totalGameDuration) {
+        roundTimeLeft = totalGameDuration - elapsedTime; // Cap to remaining game time
+      } else {
+        roundTimeLeft = nextRoundDuration;
+      }
+
+      // Random SafeCells every round
+      generateSafeCells();
+      // Show overlay for new round only if the game is not over
+      const playerPosition = `${player.x}-${player.y}`;
+      if (safeCells.includes(playerPosition)) {
+        showRoundOverlay(currentRound + 1);
+      }
+    }
+
+    // Update time variables
+    roundTimeLeft--;
+    elapsedTime++;
+
+    if (elapsedTime >= totalGameDuration) {
+      endGame(true); // Player wins if they survive the total duration
+    }
+  }
+
+  // Start the game timer
+  showRoundOverlay(1); // Overlay for round 1
+  const timerInterval = setInterval(updateTimer, 1000);
 }
 
 document.getElementById("startButton").addEventListener("click", function () {
