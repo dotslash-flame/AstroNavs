@@ -43,5 +43,22 @@ TODO:
 We have to decide how many safe co-ordinates are there for each move.
 The last move only has one safe co-ordinate. Essentially, these are the two ways of ramping up difficulty.
 
-!!! TODO:   
-Suggest a more exact specifiication for the client server interaction.
+THE CLIENT SERVER INTERACTION
+
+All clients send a request to server's "/connect" endpoint to register their IP and save appropriate cookie.
+
+When server wants to communicate to C that all 3 clients have connected and game can begin, it sends a message to endpoint "/game_start_state" of client C. This is done by sending to the IP address of the client C of a particulr room. If C receives this message, it must respond with a string "Success", no json needed for ease.
+
+When server receives "/add_safe_coordinates/<game_room>" endpoint call from C, it sends the coordinate array [(x, y), ...] to client A at endpoint "/sade_coordinates". Client A must return "Success" (no JSON) for game to end in success. Then server sends to client B a message of the format {"Message" : "Starting"} at endpoint "/game_start" and responds to the API call of C with {"Message" : "Successfully added safe coordinates"}. Game now begins on all 3 clients, with B keeping time.
+
+If the round/game ends successfully, C must send a message of JSON form {"GameState" : "Win"} to server endpoint "/result/win/<game_room>". This JSON is then forwarded by server to client A and client B at endpoint "/game_state". It also sends a string "Successfully communicated results" back to C.
+
+If the timer at B ends, it sends a message of form {"FinalState" : "Loss"} to server at endpoint "/result/loss/<game_room>" . Then this message will be forwarded to clients A and C at endpoint "game_end_loss"
+
+
+
+
+
+
+
+
