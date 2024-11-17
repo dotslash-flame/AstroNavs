@@ -83,6 +83,7 @@
                 </div>
         </div>
         <script>  
+
             /*Not sure how the game rooms are assigned or how the clients are decided
             if /connect already needs the game rooms and clients to be decided?? I didn't
             understand the server code help*/        
@@ -97,30 +98,15 @@
                     'Content-Type': 'application/JSON'
                 },
                 body: JSON.stringify({
-                    client: '', //client
-                    game_room: '' //game room
+                    client: 'a', //client
+                    game_room: '101' //game room, change from hard coded to command line
                 })
             })
             .then(() => gameloop())
             }
-            async function getsymbols()   {
 
-                //Link for acknowledging safe coordinates
-                const response = await fetch('/acknowledge_safe_coordinates/<game_room>', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/JSON'
-                        },
-                        body: JSON.stringify({
-                            client:'A'  
-                        })
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    symbols = data.safe_coordinates; 
-                    gameloop();
-                })    
-            } 
+            
+             
             async function gameloop()  {
                 safe = symbols[loopnum] - 1;
                 coordinate1 = Math.floor(safe/16) + 1;
