@@ -1,16 +1,10 @@
 from flask import Flask, request, jsonify, make_response
-import random
-import socket
+import aiohttp
+#import socket
 import json
-from flask_socketio import SocketIO, emit
-import threading
-
 
 app= Flask(__name__)
 game_rooms = {}
-socketio = SocketIO(app)
-
-client_event_ack = threading.Event()    
 
 possible_clients = ["A".lower(), "B".lower(), "C".lower()]
 
@@ -52,11 +46,10 @@ def connect():
             "GameState" : "Ready"
         }
 
-        ready_data_json = json.dumps(ready_data_json)
+        ready_data_json = json.dumps(ready_data)
 
-        send_data_with_sockets('all_clients_ready', ready_data, ClientAcknowledgement)
-        client_event_ack.wait()
-        client_event_ack.clear()
+        if not send_data_to_client(game_rooms[game_room]["clients"]["c"][0], "game_start_state", ready_data_json) == "Success":
+            return "Error informing C that game is ready", 500
 
     response_data = {
         "Message" : f"{client} connected to room {game_room} at IP : {game_rooms[game_room]['clients'][client][0]} and port {game_rooms[game_room]['clients'][client][1]}",
@@ -66,14 +59,6 @@ def connect():
 
     response.set_cookie("client", client)
     return response
-
-
-@socketio.on('connect')
-def handle_connect():
-    print("Client connected")
-
-
-
 
 @app.route('/add_safe_coordinates/<game_room>', methods = ['Post'])
 def add_safe_coordinates(game_room : str):
@@ -103,31 +88,38 @@ def add_safe_coordinates(game_room : str):
 
     data = {"Coordinates" : safe_coordinates, "Message" : "Successfully received safe coordinates"}
     json_data = json.dumps(data)
-    send_data_with_sockets('send_safe_coords', json_data, callback=ClientAcknowledgement)
 
-    client_event_ack.wait()
-    client_event_ack.clear()
+    if send_data_to_client(game_rooms[game_room]["clients"]["a"][0], "safe_coordinates", json_data) == "Success":
 
-    game_rooms[game_room]["IsRunning"] = True
-    send_data_with_sockets("game_start_b", "Starting", callback=ClientAcknowledgement)
-    
-    client_event_ack.wait()
-    client_event_ack.clear()
-    
-    send_data_with_sockets("game_start_c", "Starting", callback=ClientAcknowledgement)
-    
-    client_event_ack.wait()
-    client_event_ack.clear()
+        message = {
+            "Message" : "Starting"
+        }
 
-    return {"Message" : "Successfully added safe coordinates"}, 200
+        message = json.dumps(message)
+
+        game_rooms[game_room]["IsRunning"] = True
+        if not send_data_to_client(game_rooms[game_room]["clients"]["b"][0], "game_start", message):
+            return "Could not connect to client b", 500
+
+        return {"Message" : "Successfully added safe coordinates"}, 200
     
+    return "Could not send data to client a", 500
+
 #Receives acknowledgment from Client A about receiving safe coordinates
-def send_data_with_sockets(message_code, data, callback=None):
-    socketio.emit(message_code, data, callback=callback)
 
-def ClientAcknowledgement(message):
-    if message == "Acknowledged":
-        client_event_ack.set()
+async def send_data_to_client(ip, endpoint, data):
+    host = ip
+    port = 5000 #Make use of standardized port or make it customizable via command line       
+
+    url = f"http://{host}:{port}/{endpoint}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, data) as response:
+            if response.ok:
+                return await response.json()
+            else:
+                return False
+
 
 @app.route('/acknowledge_safe_coordinates/<game_room>', methods= ['POST'])
 def acknowledge_safe_coordinates(game_room):
@@ -149,8 +141,8 @@ def get_game_state(game_room):
     else:
         return "Game room not found.", 404
 
-@app.route("/result/<game_room>", methods=["POST"])
-def send_game_result(game_room):
+@app.route("/result/win/<game_room>", methods=["POST"])
+def send_game_win_result(game_room):
     client = request.cookies.get("client")
 
     if client != "C".lower():
@@ -164,20 +156,54 @@ def send_game_result(game_room):
     if not game_rooms[game_room]["IsReady"]:
         return "Game room is not in ready state yet", 500
     
-    result = data.get("FinalState")
+    result = data.get("GameState")
 
-    if result not in ["win", "loss"]:
-        return f"Result must be in {["win", "loss"]}", 400
+    if result not in ['Win', "Continue"]:
+        return "Some error occurred, please send correct game state", 500
     
-    if not send_data_with_sockets(game_rooms[game_room]["clients"]["b"][0], result):
+    result = {
+        "GameState" : result
+    }
+
+    if not send_data_to_client(game_rooms[game_room]["clients"]["b"][0], "game_state", result):
         return "Could not connect to client b", 500
         
-    if not send_data_with_sockets(game_rooms[game_room]["clients"]["a"][0], result):
-        return "Could not connect to client c", 500
+    if not send_data_to_client(game_rooms[game_room]["clients"]["a"][0], "game_state", result):
+        return "Could not connect to client a", 500
     
     return "Successfully communicated results", 200
 
+@app.route("/result/loss/<game_room>", methods=["POST"])
+def send_game_loss_result(game_room):
+    client = request.cookies.get("client")
 
+    if client != "B".lower():
+        return {"Message" : "Only a connected client B can send a request"}
+    
+    data = request.json
+
+    if game_room not in game_rooms:
+        return {"Message" : "No such game room found"}
+
+    if not game_rooms[game_room]["IsReady"]:
+        return "Game room is not in ready state yet", 500
+    
+    result = data.get("FinalState")
+
+    if not result == "Loss":
+        return "Some error occurred, please send correct game state", 500
+    
+    result = {
+        "FinalState" : result
+    }
+
+    if not send_data_to_client(game_rooms[game_room]["clients"]["a"][0], "game_end_loss", result):
+        return "Could not connect to client a", 500
+        
+    if not send_data_to_client(game_rooms[game_room]["clients"]["c"][0], "game_end_loss", result):
+        return "Could not connect to client c", 500
+    
+    return "Successfully communicated results", 200
 #run the server
 
 
