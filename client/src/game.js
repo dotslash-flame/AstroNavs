@@ -1,3 +1,4 @@
+// Go Nuts Babe
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -10,6 +11,12 @@ const cellSize = canvas.width / gridSize;
 // Background Stars
 const starCount = 100;
 const stars = [];
+
+// Game State
+let safeCells = [];
+let dangerousCells = [];
+let player = { x: 7, y: 7 };
+let gameOver = false;
 
 // Create Stars
 function createStars() {
@@ -47,10 +54,31 @@ function drawStars() {
   ctx.shadowColor = "transparent";
 }
 
+// Generate safe and dangerous cells
+function generateSafeCells(num = 5) {
+  safeCells = [];
+  dangerousCells = [];
+
+  while (safeCells.length < num) {
+    const x = Math.floor(Math.random() * gridSize);
+    const y = Math.floor(Math.random() * gridSize);
+    const safeCell = `${x}-${y}`;
+    if (!safeCells.includes(safeCell)) safeCells.push(safeCell);
+  }
+
+  for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      const cellKey = `${x}-${y}`;
+      if (!safeCells.includes(cellKey)) dangerousCells.push(cellKey);
+    }
+  }
+}
+
 // Start Game
 function startGame() {
-    createStars();
-    drawStars()
+  createStars();
+  drawStars();
+  generateSafeCells();
 }
 
 document.getElementById("startButton").addEventListener("click", function () {
