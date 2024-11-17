@@ -9,12 +9,17 @@ const gridSize = 16;
 const cellSize = canvas.width / gridSize;
 
 // Audio
-const bgMusic = new Audio("bg.mp3");
-const errorSound = new Audio("error.mp3");
-const wrongMoveSound = new Audio("wrong-move.mp3");
-const moveSounds = [new Audio("move.mp3"), new Audio("move-2.mp3")];
-const airstrikeSound = new Audio("airstrike.mp3");
-const airstrikeSoundNew = new Audio("airstrike-1.mp3");
+const bgMusic = new Audio("client/public/assets/audio/bg.mp3");
+const errorSound = new Audio("client/public/assets/audio/error.mp3");
+const wrongMoveSound = new Audio("client/public/assets/audio/wrong-move.mp3");
+const moveSounds = [
+  new Audio("client/public/assets/audio/move.mp3"),
+  new Audio("client/public/assets/audio/move-2.mp3"),
+];
+const airstrikeSound = new Audio("client/public/assets/audio/airstrike.mp3");
+const airstrikeSoundNew = new Audio(
+  "client/public/assets/audio/airstrike-1.mp3"
+);
 bgMusic.loop = true;
 bgMusic.volume = 0.2;
 
@@ -133,6 +138,12 @@ function drawPlayer() {
   ctx.shadowBlur = 0;
 }
 
+// Random Sound for move
+function playRandomMoveSound() {
+  const sound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
+  sound.play();
+}
+
 // Create Explosion
 function showExplosion(x, y) {
   const centerX = x * cellSize + cellSize / 2;
@@ -182,13 +193,145 @@ function showExplosion(x, y) {
   requestAnimationFrame(animateExplosion);
 }
 
+// Airstrike
+function airStrike() {
+  if (gameOver) return;
+
+  console.log("Airstrike Triggered!!");
+
+  // Check if the player is in a dangerous cell
+  const playerPosition = `${player.x}-${player.y}`;
+  if (dangerousCells.includes(playerPosition)) {
+    showExplosion(player.x, player.y);
+    airstrikeSound.play();
+    endGame(false);
+  } else {
+    airstrikeSoundNew.play();
+    const numExplosions = 10;
+    const explosionCoords = dangerousCells
+      .sort(() => 0.5 - Math.random())
+      .slice(0, numExplosions);
+
+    //   Random Explosion
+    explosionCoords.forEach((coord) => {
+      const [x, y] = coord.split("-").map(Number);
+      showExplosion(x, y);
+    });
+  }
+}
+
+// Game Loop
+function gameLoop() {
+  if (!gameOver) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawStars();
+    // drawGrid();
+    drawPlayer();
+    drawTimer();
+    requestAnimationFrame(gameLoop);
+  }
+}
+
 // Start Game
 function startGame() {
   createStars();
-  drawStars();
   generateSafeCells();
-  drawPlayer();
-  drawTimer();
+  gameLoop();
+  bgMusic.play();
+
+  const totalGameDuration = 300; // 5 mins
+  const roundDurations = [60, 45, 45]; // First round: 60s, next two: 45s each
+  const defaultRoundDuration = 30; // All remaining rounds: 30s each
+  const timerElement = document.getElementById("timer");
+  const overlay = document.getElementById("overlay"); // Round change
+
+  let elapsedTime = 0;
+  let currentRound = 0;
+  let roundTimeLeft = roundDurations[currentRound] || defaultRoundDuration; // Initial round
+  let gameOver = false;
+
+  function showRoundOverlay(roundNumber) {
+    if (overlay && !gameOver) {
+      // Only show overlay if the game is not over
+      overlay.style.display = "block";
+      overlay.innerHTML = `<h1>Round ${roundNumber} Starting!</h1>`;
+      setTimeout(() => {
+        overlay.style.display = "none"; // Hide after 2sec
+      }, 2000);
+    }
+  }
+
+  function updateTimer() {
+    if (gameOver) return; // Stop the timer if game is over
+
+    if (timerElement) {
+      timerElement.textContent = `Round ${
+        currentRound + 1
+      }, Time: ${roundTimeLeft}s`;
+    }
+
+    if (roundTimeLeft <= 0) {
+      airStrike(); // Airstrike at the end of the round
+      currentRound++;
+
+      if (elapsedTime >= totalGameDuration) {
+        endGame(false); // End the game if time runs out
+        return;
+      }
+
+      const nextRoundDuration =
+        roundDurations[currentRound] || defaultRoundDuration;
+
+      if (elapsedTime + nextRoundDuration > totalGameDuration) {
+        roundTimeLeft = totalGameDuration - elapsedTime; // Cap to remaining game time
+      } else {
+        roundTimeLeft = nextRoundDuration;
+      }
+
+      // Random SafeCells every round
+      generateSafeCells();
+      // Show overlay for new round only if the game is not over
+      const playerPosition = `${player.x}-${player.y}`;
+      if (safeCells.includes(playerPosition)) {
+        showRoundOverlay(currentRound + 1);
+      }
+    }
+
+    // Update time variables
+    roundTimeLeft--;
+    elapsedTime++;
+
+    if (elapsedTime >= totalGameDuration) {
+      endGame(true); // Player wins if they survive the total duration
+    }
+  }
+
+  // Start the game timer
+  showRoundOverlay(1); // Overlay for round 1
+  const timerInterval = setInterval(updateTimer, 1000);
+}
+
+//  Fuck the game
+function endGame(win) {
+  if (gameOver) return; // Prevent running multiple times
+
+  gameOver = true;
+  bgMusic.pause(); // Stop background music
+  bgMusic.currentTime = 0; // Reset the music
+  const overlay = document.getElementById("overlay");
+
+  if (overlay) {
+    overlay.style.display = "block"; // Show overlay
+    overlay.innerHTML = win
+      ? "<h1>You Survived! You Win!</h1>"
+      : "<h1>Game Over! You Lost!</h1>";
+    overlay.innerHTML +=
+      '<button onclick="location.reload()">Restart Game</button>';
+  }
+
+  if (!win) {
+    airstrikeSound.play(); // Play airstrike sound if the player lost
+  }
 }
 
 document.getElementById("startButton").addEventListener("click", function () {
@@ -209,9 +352,14 @@ document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
       player.x = x;
       player.y = y;
       const cellKey = `${x}-${y}`;
+      if (dangerousCells.includes(cellKey)) {
+        wrongMoveSound.play();
+      } else {
+        playRandomMoveSound();
+      }
       e.target.value = "";
     } else {
-      console.log("Invalid co-ordinates");
+      errorSound.play();
     }
   }
 });
