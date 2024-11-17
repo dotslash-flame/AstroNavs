@@ -9,12 +9,17 @@ const gridSize = 16;
 const cellSize = canvas.width / gridSize;
 
 // Audio
-const bgMusic = new Audio("bg.mp3");
-const errorSound = new Audio("error.mp3");
-const wrongMoveSound = new Audio("wrong-move.mp3");
-const moveSounds = [new Audio("move.mp3"), new Audio("move-2.mp3")];
-const airstrikeSound = new Audio("airstrike.mp3");
-const airstrikeSoundNew = new Audio("airstrike-1.mp3");
+const bgMusic = new Audio("client/public/assets/audio/bg.mp3");
+const errorSound = new Audio("client/public/assets/audio/error.mp3");
+const wrongMoveSound = new Audio("client/public/assets/audio/wrong-move.mp3");
+const moveSounds = [
+  new Audio("client/public/assets/audio/move.mp3"),
+  new Audio("client/public/assets/audio/move-2.mp3"),
+];
+const airstrikeSound = new Audio("client/public/assets/audio/airstrike.mp3");
+const airstrikeSoundNew = new Audio(
+  "client/public/assets/audio/airstrike-1.mp3"
+);
 bgMusic.loop = true;
 bgMusic.volume = 0.2;
 
@@ -182,6 +187,33 @@ function showExplosion(x, y) {
   requestAnimationFrame(animateExplosion);
 }
 
+// Airstrike
+function airStrike() {
+  if (gameOver) return;
+
+  console.log("Airstrike Triggered!!");
+
+  // Check if the player is in a dangerous cell
+  const playerPosition = `${player.x}-${player.y}`;
+  if (dangerousCells.includes(playerPosition)) {
+    showExplosion(player.x, player.y);
+    airstrikeSound.play();
+    endGame(false);
+  } else {
+    airstrikeSoundNew.play();
+    const numExplosions = 10;
+    const explosionCoords = dangerousCells
+      .sort(() => 0.5 - Math.random())
+      .slice(0, numExplosions);
+
+    //   Random Explosion
+    explosionCoords.forEach((coord) => {
+      const [x, y] = coord.split("-").map(Number);
+      showExplosion(x, y);
+    });
+  }
+}
+
 // Start Game
 function startGame() {
   createStars();
@@ -209,9 +241,14 @@ document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
       player.x = x;
       player.y = y;
       const cellKey = `${x}-${y}`;
+      if (dangerousCells.includes(cellKey)) {
+        wrongMoveSound.play();
+      } else {
+        playRandomMoveSound();
+      }
       e.target.value = "";
     } else {
-      console.log("Invalid co-ordinates");
+      errorSound.play();
     }
   }
 });
