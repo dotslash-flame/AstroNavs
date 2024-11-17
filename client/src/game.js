@@ -74,11 +74,24 @@ function generateSafeCells(num = 5) {
   }
 }
 
+// Create Player
+function drawPlayer() {
+  const playerPosition = `${player.x}-${player.y}`;
+  ctx.shadowBlur = safeCells.includes(playerPosition) ? 0 : 15;
+  ctx.shadowColor = safeCells.includes(playerPosition) ? "transparent" : "red";
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(player.x * cellSize, player.y * cellSize, cellSize, cellSize);
+
+  ctx.shadowBlur = 0;
+}
+
 // Start Game
 function startGame() {
   createStars();
   drawStars();
   generateSafeCells();
+  drawPlayer();
 }
 
 document.getElementById("startButton").addEventListener("click", function () {
@@ -89,4 +102,19 @@ document.getElementById("startButton").addEventListener("click", function () {
   }
 
   startGame();
+});
+
+// Take Player Input
+document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const [x, y] = e.target.value.split(",").map(Number);
+    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+      player.x = x;
+      player.y = y;
+      const cellKey = `${x}-${y}`;
+      e.target.value = "";
+    } else {
+      console.log("Invalid co-ordinates");
+    }
+  }
 });
