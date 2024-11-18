@@ -1,8 +1,7 @@
-// Go Nuts Babe
+// Setting up the game canvas
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Create Canvas
 canvas.width = 640;
 canvas.height = 640;
 const gridSize = 16;
@@ -10,30 +9,66 @@ const cellSize = canvas.width / gridSize;
 
 //TODO: make these inputtable by command line
 const game_room = "101"
-
 const serverAddress = "192.168.0.175"
-
 const serverPort = "5101"
 
-
+// FIXME: these should be saved as a JSON file maybe
+//        the game state json that keeps getting updated, or as a cookie
 var isGameReady = false
 var isGameOver = false
 
 
 // Audio
-const bgMusic = new Audio("client/public/assets/audio/bg.mp3");
-const errorSound = new Audio("client/public/assets/audio/error.mp3");
-const wrongMoveSound = new Audio("client/public/assets/audio/wrong-move.mp3");
+const bgMusic = new Audio("./public/assets/audio/bg.mp3");
+const errorSound = new Audio("./public/assets/audio/error.mp3");
+const wrongMoveSound = new Audio("./public/assets/audio/wrong-move.mp3");
 const moveSounds = [
-  new Audio("client/public/assets/audio/move.mp3"),
-  new Audio("client/public/assets/audio/move-2.mp3"),
+  new Audio("./public/assets/audio/move.mp3"),
+  new Audio("./public/assets/audio/move-2.mp3"),
 ];
-const airstrikeSound = new Audio("client/public/assets/audio/airstrike.mp3");
+const airstrikeSound = new Audio("./public/assets/audio/airstrike.mp3");
 const airstrikeSoundNew = new Audio(
-  "client/public/assets/audio/airstrike-1.mp3"
+  "./public/assets/audio/airstrike-1.mp3"
 );
+
+
+
+mutedMusic = true;
+
 bgMusic.loop = true;
 bgMusic.volume = 0.2;
+bgMusic.muted = true;
+
+const button = document.getElementById("musicToggleBtn")
+button.addEventListener("click", () => {
+  if (mutedMusic) {
+    mutedMusic = false;
+
+    bgMusic.muted = false;
+    button.innerHTML = "🎵 Music: On";
+
+    // Try to play bg music if not already playing
+    if (bgMusic.paused) {
+      bgMusic.play().catch(error => {
+        console.log("Error playing background music:", error);
+      });
+    }
+  } else {
+    mutedMusic = true;
+
+    bgMusic.muted = true;
+    button.innerHTML = "🎵 Music: Off";
+  }
+});
+
+
+try {
+  bgMusic.play().catch(error => {
+    console.log("Autoplay failed, music will play when unmuted:", error);
+  })
+} catch (error) {
+  console.log("Couldn't play bgMusic", error);
+}
 
 // Background Stars
 const starCount = 100;
@@ -183,8 +218,10 @@ function drawPlayer() {
 
 // Random Sound for move
 function playRandomMoveSound() {
-  const sound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
-  sound.play();
+  if (!mutedMusic) {
+    const sound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
+    sound.play();
+  }
 }
 
 // Create Explosion
@@ -246,10 +283,14 @@ function airStrike() {
   const playerPosition = `${player.x}-${player.y}`;
   if (dangerousCells.includes(playerPosition)) {
     showExplosion(player.x, player.y);
-    airstrikeSound.play();
+    if (!mutedMusic) {
+      airstrikeSound.play();
+    }
     endGame(false);
   } else {
-    airstrikeSoundNew.play();
+    if (!mutedMusic) {
+      airstrikeSoundNew.play();
+    }
     const numExplosions = 10;
     const explosionCoords = dangerousCells
       .sort(() => 0.5 - Math.random())
@@ -280,7 +321,6 @@ function startGame() {
   createStars();
   generateSafeCells();
   gameLoop();
-  bgMusic.play();
 
   const totalGameDuration = 300; // 5 mins
   const roundDurations = [60, 45, 45]; // First round: 60s, next two: 45s each
@@ -372,7 +412,9 @@ function endGame(win) {
   }
 
   if (!win) {
-    airstrikeSound.play(); // Play airstrike sound if the player lost
+    if (!mutedMusic) {
+      airstrikeSound.play(); // Play airstrike sound if the player lost
+    }
   }
 }
 
@@ -406,34 +448,34 @@ async function connectToServer() {
     })
 }
 
-io = require("socket.io")
-const socket = io.connect(`http://${serverAddress}:${serverPort}`)
+// io = require("socket.io")
+// const socket = io.connect(`http://${serverAddress}:${serverPort}`)
 
-socket.on('all_clients_ready', (data, ackCallBack) => {
-  ackCallBack("Acknowledged")
-  isGameReady = true
-}
-)
+// socket.on('all_clients_ready', (data, ackCallBack) => {
+//   ackCallBack("Acknowledged")
+//   isGameReady = true
+// }
+// )
 
-socket.on('game_start_c', (data, ackCallBack) => {
-  ackCallBack("Acknowledged")
-  isGameReady = true
-})
+// socket.on('game_start_c', (data, ackCallBack) => {
+//   ackCallBack("Acknowledged")
+//   isGameReady = true
+// })
 
-document.getElementById("startButton").addEventListener("click", async function () {
-  const overlay = document.getElementById("overlay");
+// document.getElementById("startButton").addEventListener("click", async function () {
+//   const overlay = document.getElementById("overlay");
 
-  if (overlay) {
-    overlay.style.display = "none";
-  }
+//   if (overlay) {
+//     overlay.style.display = "none";
+//   }
 
-  //TODO: Maybe add some loading thing between connect and wait game start
-  connectToServer()
+//   //TODO: Maybe add some loading thing between connect and wait game start
+//   connectToServer()
 
-  await waitGameStart()
+//   await waitGameStart()
 
-  startGame();
-});
+//   startGame();
+// });
 
 // Take Player Input
 document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
@@ -443,14 +485,18 @@ document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
       player.x = x;
       player.y = y;
       const cellKey = `${x}-${y}`;
-      if (dangerousCells.includes(cellKey)) {
-        wrongMoveSound.play();
-      } else {
-        playRandomMoveSound();
+      if (!mutedMusic) {
+        if (dangerousCells.includes(cellKey)) {
+          wrongMoveSound.play();
+        } else {
+          playRandomMoveSound();
+        }
       }
       e.target.value = "";
     } else {
-      errorSound.play();
+      if (!mutedMusic) {
+        errorSound.play();
+      }
     }
   }
 });
