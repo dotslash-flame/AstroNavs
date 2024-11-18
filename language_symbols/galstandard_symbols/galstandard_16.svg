@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">  <image id="image16" width="64" height="64" x="0" y="0"
-    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAAAAACPAi4CAAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
-AAB1MAAA6mAAADqYAAAXcJy6UTwAAAACYktHRAD/h4/MvwAAAAlwSFlzAAAAYAAAAGAA8GtCzwAA
-AAd0SU1FB+gLEAQrLFKrbJcAAAE5SURBVFjDY/zPQBlgolD/qAGjBuAx4AmFBjjITiHehP9YAB8D
-65H/RAIcYfA78jVlgWjwOOYfRV64KclQR5wXcBjwcR8z0zaKDPjfyiB4jyID/gUwmP6gxID/75QY
-Miky4P8FToYFFBnwfxYD53mKDPifyKD6gSIDvhsx+P+jxID/t/m5rhIwgAVvMlVZIaVFICUzYquZ
-+D995CM2Nw98kYYjDOJZsYmK9XBgCmILWVdc1pURGQsbtmLVvmfWRyK9wBWK1YB3NAnEUQNGjgEf
-4p5SZkDpYr+vFBnQqXYu9h8lBghtElxfTYkBDOob2DpmU2IAg910huz9lBjAkFTwO/QOVhmCdRcU
-/PFmYGJIxxQnOiExL9fDGhHEp0TeTeLYyi9GEro8Z1+5MVNkAFYwRHLjqAGjBhACAD46GKGcgG25
-AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI0LTExLTE2VDA0OjQyOjQ3KzAwOjAwA/cVFgAAACV0RVh0
-ZGF0ZTptb2RpZnkAMjAyNC0xMS0xNlQwNDo0Mjo0NyswMDowMHKqraoAAAAodEVYdGRhdGU6dGlt
-ZXN0YW1wADIwMjQtMTEtMTZUMDQ6NDM6NDQrMDA6MDD7lf3WAAAAAElFTkSuQmCC" />
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="25.544746"
+   height="40.776215"
+   viewBox="0 0 25.544746 40.776215"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-84.053534,-458.75223)">
+    <g
+       id="g16">
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:5.9;stroke-dasharray:none;paint-order:normal"
+         d="M 95.610725,473.05717 85.053534,459.36278 v 18.97994 h 23.544746 v 20.54159 l -7.68808,-9.12959"
+         id="path39" />
+    </g>
+  </g>
 </svg>

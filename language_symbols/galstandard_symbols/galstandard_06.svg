@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="22.075209"
+   width="23.808575"
    height="44.169922"
-   viewBox="0 0 22.075209 44.169922"
+   viewBox="0 0 23.808575 44.169922"
    version="1.1"
    id="svg1"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,21 +13,21 @@
      id="defs1" />
   <g
      id="layer1"
-     transform="translate(-85.463632,-266.49078)">
+     transform="translate(-19.794153,-330.29102)">
     <g
-       id="g13">
+       id="g6">
       <path
          style="color:#000000;fill:#000000;stroke-linecap:square;stroke-miterlimit:5.9;-inkscape-stroke:none"
-         d="m 105.53884,266.49078 v 44.16992 h 2 v -44.16992 z"
-         id="path31" />
+         d="m 30.820312,330.29102 v 44.16992 h 2 v -44.16992 z"
+         id="path1-4" />
       <path
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none;paint-order:normal"
-         d="M 106.53884,288.57574 86.170739,268.20764 Z"
-         id="path32" />
+         d="m 31.820312,373.75383 -7.220783,-8.34626 h -4.805376"
+         id="path18" />
       <path
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none;paint-order:normal"
-         d="m 106.83173,289.28285 -20.368098,20.3681 z"
-         id="path33" />
+         d="m 31.576568,373.75383 7.220783,-8.34626 h 4.805376"
+         id="path19" />
     </g>
   </g>
 </svg>

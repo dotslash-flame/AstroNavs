@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="33.958927"
+   height="33.154438"
+   viewBox="0 0 33.958927 33.154438"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-79.05882,-16.194098)">
+    <g
+       id="g9">
+      <circle
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
+         id="circle21"
+         cx="84.63604"
+         cy="21.631701"
+         r="4.07722" />
+      <circle
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
+         id="circle22"
+         cx="107.94053"
+         cy="21.271318"
+         r="4.07722" />
+      <circle
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
+         id="circle23"
+         cx="107.94053"
+         cy="43.271317"
+         r="4.07722" />
+      <path
+         id="rect23"
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:5.9"
+         d="M 90.21326,48.348536 H 80.05882 v -10.15444 h 10.15444" />
+      <circle
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
+         id="circle25"
+         cx="84.63604"
+         cy="21.631701"
+         r="4.07722" />
+      <circle
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
+         id="circle26"
+         cx="107.94053"
+         cy="43.271317"
+         r="4.07722" />
+    </g>
+  </g>
+</svg>

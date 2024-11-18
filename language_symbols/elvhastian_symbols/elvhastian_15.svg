@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">  <image id="image15" width="64" height="64" x="0" y="0"
-    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAAAAACPAi4CAAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
-AAB1MAAA6mAAADqYAAAXcJy6UTwAAAACYktHRAD/h4/MvwAAAAlwSFlzAAAAYAAAAGAA8GtCzwAA
-AAd0SU1FB+gLDww5CWcy3nIAAALaSURBVFjD3ZfLTxNRFIe/KQ+hBIzyKFYelkdbEgNRY6y6ICYm
-Ku7dEf8CN65cGeLC6FJjTFxBBI3iwrhRVhpMFCPESGICbYoVSHkIUapQpLRcF7W2tzOdR7sw8azu
-mfub7/7OzM3MuYqgsLAVeP//ACjOcf3X4Hhot/vUacWQIDTjoSM5674TF/qhDbiWXvhYOA/AA+Dw
-0OTL6y6gbckyYL4CLsaEECIxUAVndqwCeuFk7M94rAyeWASEiij+9De7CV0mAYmBR0IIIa5Ab/rq
-Zj18MAfoh2dCCNEGYxmKy9CnA8jYiRF4BwSCNPoyNsp5eGVuK3sgADyHnkyFT2HKNGAaGMkC2J18
-/WlqKyfKKd0WogYlIlXZrfsUMxzY2onNsriKq0paohnCpkpI1jAJnbLEDlvmAF7wMwMdsmSXaYAH
-/CzBfllSCjELJSxBvSxRYMckQMHPMjhkyTpUmANUOln+tg5VKkBlboD0TfSECYxsbOTtAC9Ml+5p
-KJElaypPOQEe8KslC7CvIMAiRbUWSlApohHqikwCGu3MxNUG9CqQATY3sVC24gs0mQVwEDayFSFw
-6QDkf+PV9Y4uDQcHTAPan6oVMuBHfK9eCVoRhJZ0dq+67LZFQABbazoLs1VpDbDynabyXH7MAALQ
-LhfUZhngTmeJEHanNUBQcvA5RqtiDSA7GIdDFAg4ahEwQ0lzOpuAI1kCoR8r4MpoFuyURHP+2jRj
-DjIMjEbxlcsCI8CsBHgB57AGmJO+BnkA5jMBwQDOLosAycEg9KiaZ4O34IOp1DjeBKM6XZpmeGEl
-NX4MblXXalTCJqTem7gBl9Ttv4EDB6Qa/n5wRFUCI0ALrCVHS7VwS1gGHAe/EEKIWDd0bqsFRs+g
-AT4CrJ4dxT6gdUAycHAXOobev+mrA2VYS2AEiNSkViq7L/IBiNfVyft9E9rziuHZeW347YLNe+FE
-jmljgEH8+6Pvb89PZRa7xwKtAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI0LTExLTE1VDEyOjU0OjU4
-KzAwOjAw4adAvwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNC0xMS0xNVQxMjo1NDo1OCswMDowMJD6
-+AMAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjQtMTEtMTVUMTI6NTc6MDkrMDA6MDDCT2cPAAAA
-AElFTkSuQmCC" />
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40.009182"
+   height="55.479992"
+   viewBox="0 0 40.009182 55.479996"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-74.503357,-389.25949)">
+    <g
+       id="g10">
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2.925;stroke-linecap:square;stroke-linejoin:miter"
+         d="m 81.754701,407.6124 c 0,0 0.860733,-22.22783 13.117693,-15.7396 12.881826,6.81901 -3.700277,48.56116 3.620247,51.01777 11.964909,4.01517 14.428149,-22.44858 14.428149,-22.44858"
+         id="path57" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2.925;stroke-linecap:round;stroke-linejoin:round"
+         d="m 75.962852,397.96095 2.828427,18.34817 z"
+         id="path58" />
+    </g>
+  </g>
 </svg>

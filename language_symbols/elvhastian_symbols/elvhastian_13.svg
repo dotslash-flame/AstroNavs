@@ -1,22 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">  <image id="image13" width="64" height="64" x="0" y="0"
-    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAAAAACPAi4CAAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
-AAB1MAAA6mAAADqYAAAXcJy6UTwAAAACYktHRAD/h4/MvwAAAAlwSFlzAAAAYAAAAGAA8GtCzwAA
-AAd0SU1FB+gLDww5CWcy3nIAAAK5SURBVFjD7ddbSBRRGAfw/7SrsC5srZRmUYIsQiZJUJiUW71U
-BkVhikgkRBTLRkLqQ3bFroRBF5EMAotAsKBNykDTskDIJGEfu6qBqItUSw+2o/v1kO7M2XO+dcEX
-H/Y8zTnM/zcz55z5mNEI82uL5plPAAlgQQKhts9xZKjjo7lnbpWwdxu90IeHtcXrVjudWe4zvcbw
-9BFY/JGeCFQAKRGhzAZgSf7uspIdWcC+oJEHehlgNMckHCq/83p05njoBK6Y8qeIAWgsF0h5RXK7
-hyYiIgp7AFQTC6iEUOMvak/ODSnzEqAQnsJ33Zo5rM7LgCzUYwUKRpi8ApCEr3kFjVNcXgVwM6nM
-KwG1oM6rAZXA5BlAFri8BPQdb1cJQr65lQe+OYAKXRLE6xe6eOCY5e1hlIajhKj7r8IYC2Ruo7AX
-V8WniH7+R+jigCGcJ9K32AbNgjR//WjkgF48IOq7jFumteiU5v+PVskBL+EjcgM3TKtplddv1U4O
-eI5nRBMtT3QyCfL65683jsWiuhhBILWs2Do7sGwDgKRdxhkj0wAcv7mqnIqAWH+9zQD0vV2zA8Ur
-03qAZJ2rypMWj7kb9gDwmndURma5n8i9lt0HWduj8zXCnjxoGSCi7EIWKMqQ8sKeHLRn/6QxrZoF
-qhCQ8oLQqm0cb8ALFniMNjkvCHctSx1rplgg4OpU5AXhzeY8P7GA4v4lQWyIL88LiDPPCog3zwmI
-mQ/7TvrmEBAr/8MN2CZjC4iRH0hPqtufolNMAXx+aLmzh+pPzzEPYPN0IOmdPEGSADZPzpzIe0F/
-3zd8UgsiUGf+/rmm2YsuNLXcv1mzx2UFLs0Mj+YA9u8MUALUGr2e0vT/RSdt69Hb/dNkEjoiJ2nC
-T9eXi5s8Qk0bngjaHOlO8UNz/FzG2Ugp1BJ/bQlgQQD/ADxaz93kbKWTAAAAJXRFWHRkYXRlOmNy
-ZWF0ZQAyMDI0LTExLTE1VDEyOjU0OjU4KzAwOjAw4adAvwAAACV0RVh0ZGF0ZTptb2RpZnkAMjAy
-NC0xMS0xNVQxMjo1NDo1OCswMDowMJD6+AMAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjQtMTEt
-MTVUMTI6NTc6MDkrMDA6MDDCT2cPAAAAAElFTkSuQmCC" />
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="41.051147"
+   height="41.05151"
+   viewBox="0 0 41.051147 41.051513"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-77.274965,-268.62881)">
+    <g
+       id="g8">
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:1.59495;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 90.813991,270.99198 c 0,0 10.672249,-2.86806 13.841749,0.45056 1.2962,1.3572 -6.866029,7.83289 -5.092639,2.87366"
+         id="path45" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:#000000;stroke:#000000;stroke-width:2.925;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="M 116.87809,270.07683 78.722986,308.2323 Z"
+         id="path43" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:#000000;stroke:#000000;stroke-width:2.925;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="M 78.722986,270.07683 116.87809,308.2323 Z"
+         id="path44" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:1.59495;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 104.78709,307.31715 c 0,0 -10.672255,2.86806 -13.841755,-0.45056 -1.2962,-1.3572 6.86603,-7.83289 5.09264,-2.87366"
+         id="path46" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:1.59495;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 79.638128,296.14111 c 0,0 -2.86806,-10.67225 0.45056,-13.84175 1.3572,-1.2962 7.83289,6.86603 2.87366,5.09264"
+         id="path47" />
+      <path
+         style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:1.59495;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 115.96295,282.16802 c 0,0 2.86806,10.67225 -0.45056,13.84175 -1.3572,1.2962 -7.83289,-6.86603 -2.87366,-5.09264"
+         id="path48" />
+    </g>
+  </g>
 </svg>
