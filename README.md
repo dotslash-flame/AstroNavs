@@ -29,14 +29,14 @@ The grid that will be drawn is 16x16
 The ship takes up one co-ordinate (one square).
 
 # Gameplay Loop
-The game lasts for 5 minutes.
+The game lasts for 5 minutes.  
 The first move lasts for 60 seconds.  
-The second move lasts for 45 seconds.
-The third move lasts for 45 seconds.
-The fourth move lasts for 30 seconds.
-The fifth move lasts for 30 seconds.
-The sixth move lasts for 30 seconds.
-The seventh move lasts for 30 seconds.
+The second move lasts for 45 seconds.  
+The third move lasts for 45 seconds.  
+The fourth move lasts for 30 seconds.  
+The fifth move lasts for 30 seconds.  
+The sixth move lasts for 30 seconds.  
+The seventh move lasts for 30 seconds.  
 The eighth move lasts for 30 seconds.
 
 TODO:  
@@ -54,11 +54,3 @@ When server receives "/add_safe_coordinates/<game_room>" endpoint call from C, i
 If the round/game ends successfully, C must send a message of JSON form {"GameState" : "Win"} to server endpoint "/result/win/<game_room>". This JSON is then forwarded by server to client A and client B at endpoint "/game_state". It also sends a string "Successfully communicated results" back to C.
 
 If the timer at B ends, it sends a message of form {"FinalState" : "Loss"} to server at endpoint "/result/loss/<game_room>" . Then this message will be forwarded to clients A and C at endpoint "game_end_loss"
-
-
-
-
-
-
-
-

@@ -107,7 +107,7 @@ function generateSafeCells(num = 5) {
     const safeCell = `${x}-${y}`;
     if (!safeCells.includes(safeCell)) safeCells.push(safeCell);
 
-    if(!safeCoords.includes((x, y))) safeCoords.push((x, y))
+    if (!safeCoords.includes((x, y))) safeCoords.push((x, y))
   }
 
   for (let x = 0; x < gridSize; x++) {
@@ -121,29 +121,29 @@ function generateSafeCells(num = 5) {
   waitGameStart()
 }
 
-async function sendSafeCoordinatesToServer(safeCoords){
+async function sendSafeCoordinatesToServer(safeCoords) {
   if (safeCoords.length == 0)
     return false
   uri = `http://${serverAddress}:${serverPort}/add_safe_coordinates/${game_room}`
   await fetch(uri, {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/JSON'
+      'Content-Type': 'application/JSON'
     },
     body: JSON.stringify({
-      safe_coordinates : safeCoords
+      safe_coordinates: safeCoords
     }),
-    credentials : 'include'
+    credentials: 'include'
   })
-  .then(response => {
-    if (response.ok){
-      return response.json()
-    }    
-    else {
-      console.error('Request failed with status:', response.status);
-      throw new Error('Failed to connect to server');
-    }
-  })
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      }
+      else {
+        console.error('Request failed with status:', response.status);
+        throw new Error('Failed to connect to server');
+      }
+    })
 }
 
 // Display Timer
@@ -206,7 +206,7 @@ function showExplosion(x, y) {
     // Explosion in surrounding cells
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
-        // Avoid out-of-bounds)
+        // Avoid out-of-bounds
         const neighborX = x + dx;
         const neighborY = y + dy;
         if (
@@ -308,9 +308,8 @@ function startGame() {
     if (gameOver) return; // Stop the timer if game is over
 
     if (timerElement) {
-      timerElement.textContent = `Round ${
-        currentRound + 1
-      }, Time: ${roundTimeLeft}s`;
+      timerElement.textContent = `Round ${currentRound + 1
+        }, Time: ${roundTimeLeft}s`;
     }
 
     if (roundTimeLeft <= 0) {
@@ -378,33 +377,33 @@ function endGame(win) {
 }
 
 // Very shitty design, ideally we don't let user click start game till it is ready
-async function waitGameStart(){
+async function waitGameStart() {
   while (isGameReady === false) {
     await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
   }
 }
 
-async function connectToServer(){
-    uri = `http://${serverAddress}:${serverPort}/connect`
-    await fetch(uri, {
+async function connectToServer() {
+  uri = `http://${serverAddress}:${serverPort}/connect`
+  await fetch(uri, {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/JSON'
+      'Content-Type': 'application/JSON'
     },
     body: JSON.stringify({
-        client: 'c',
-        game_room: game_room
+      client: 'c',
+      game_room: game_room
     }),
   })
-  .then(response => {
-    if (response.ok){
-      return response.json()
-    }    
-    else {
-      console.error('Request failed with status:', response.status);
-      throw new Error('Failed to connect to server');
-    }
-  })
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      }
+      else {
+        console.error('Request failed with status:', response.status);
+        throw new Error('Failed to connect to server');
+      }
+    })
 }
 
 io = require("socket.io")
@@ -413,7 +412,7 @@ const socket = io.connect(`http://${serverAddress}:${serverPort}`)
 socket.on('all_clients_ready', (data, ackCallBack) => {
   ackCallBack("Acknowledged")
   isGameReady = true
-  }
+}
 )
 
 socket.on('game_start_c', (data, ackCallBack) => {

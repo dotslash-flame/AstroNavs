@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>AstroNavs Logs</title>
+  <style>
+    #log-container {
+      background: #1e1e1e;
+      color: #00ff00;
+      font-family: monospace;
+      padding: 10px;
+      height: 80vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="log-container"></div>
+  <script>
+    const logContainer = document.getElementById('log-container');
+    const source = new EventSource('/logs/stream');
+
+    source.onmessage = function (event) {
+      logContainer.innerHTML += event.data + '\n';
+      logContainer.scrollTop = logContainer.scrollHeight;
+    };
+  </script>
+</body>
+
+</html>
