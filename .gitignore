@@ -201,3 +201,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# logs directory
+logs/
+
+# testing scripts
+*test_*
