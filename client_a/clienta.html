@@ -69,37 +69,22 @@
   <div id="gameover">
     <h1 style="margin-top:5%;">GAME OVER</h1>
   </div>
-  <div style="height:100%;width:10px;position:fixed;background-color:black;margin-left:49%;"></div>
-  <div style="float:left">
     <table id="table1">
       <tr>
         <td style="text-align: center;">Your Symbols Are</td>
       </tr>
-      <tr>
-        <td style="text-align: center;"><img id="symbol1" src=""></td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img id="symbol2" src=""></td>
-      </tr>
     </table>
-  </div>
-  <div style="float:right;text-align:center;height:90%;width:35%;margin-right:5%;">
-    <p>Elvhastian to Galstandard</p>
-    <div id="translationtable">
-      <img style="float:left" src="../assets/elvhastian.svg">
-      <img style="float:right" src="../assets/galstandard.svg ">
-      <span style="font-size:160px;">&rarr;</span>
-      <span style="font-size:160px;">&rarr;</span>
-    </div>
-  </div>
   <script>
 
     /*Not sure how the game rooms are assigned or how the clients are decided
     if /connect already needs the game rooms and clients to be decided?? I didn't
     understand the server code help*/
-    loopnum = 0;
-    intervals = [60, 45, 45, 30, 30, 30, 30, 30]
-    symbols = [];
+    let symbols = [];
+    let current_move = 0;
+    let game_over = false;
+
+    const room_id = "101"
+
     //Link for connecting to the game
     async function connect() {
       response = await fetch('/connect', {
@@ -109,37 +94,132 @@
         },
         body: JSON.stringify({
           client: 'a', //client
-          game_room: '101' //game room, change from hard coded to command line
+          game_room: room_id //game room, change from hard coded to command line
         })
       })
-        .then(() => gameloop())
+        .then(() => pollForCoordinates())
+        .then(() => addImagesCorrespondingToCoordinates())
+        .then(() => gameLoop())
+    }
+
+    async function gameLoop() {
+      while(game_over == false){
+          pollForCoordinates()
+          .then(() => addImagesCorrespondingToCoordinates())
+          .then(() => pollForGameState())
+      }
+    }
+
+    async function getGameState()
+    {
+      response = await fetch(`/get_game_state/${room_id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/JSON'
+        },
+        credentials : "include"
+      })
+      return response.json()
+    }
+
+    async function getCoordinates() {
+      data = await getGameState()
+      let safe_coordinates = data["safe_coordinates"]
+      if (safe_coordinates.length > 0)
+      {
+        symbols = safe_coordinates
+        current_move = data["current_move"]
+        return true
+      }
+      return false
+    }
+
+    async function pollForGameState() {
+
+    }
+
+    async function pollForCoordinates() {
+      let intervalId = setInterval(async () => {
+        if (await getCoordinates()) {
+          console.log("Received coordinates and coordintes have been stored")
+          clearInterval()
+        }
+      }
+    )
     }
 
 
+    async function addImagesCorrespondingToCoordinates() {
+    const table = document.createElement("table"); // Create a new table
+    table.id = "generatedTable";
+    table.style.margin = "0 auto";
+    table.style.borderCollapse = "collapse";
+    table.style.textAlign = "center";
 
-    async function gameloop() {
-      safe = symbols[loopnum] - 1;
-      coordinate1 = Math.floor(safe / 16) + 1;
-      coordinate2 = (safe % 16) + 1;
-      document.getElementById("symbol1").src = "../assets/elvhastian_" + coordinate1 + ".svg";
-      document.getElementById("symbol2").src = "../assets/elvhastian_" + coordinate2 + ".svg";
-      //Link for getting game state
-      const response = await fetch("/get_game_state/<game_room>")
-        .then(response => response.json())
-        .then((state) => {
-          if (!state.game_over) {
-            if (i >= 7) {
-              document.getElementById("gameover").style.display = "block";
-              document.getElementById("endgame").innerText = "You Win";
-            } else {
-              wait = 1000 * intervals[i];
-              i++;
-              SetTimeout(() => { gameloop() }, wait)
-            }
-          } else {
-            document.getElementById("gameover").style.display = "block";
-          }
-        })
+    symbols.forEach(([int1, int2]) => {
+      const row = table.insertRow(); // Create a new row
+      const cell1 = row.insertCell(); // Create first column cell
+      const cell2 = row.insertCell(); // Create second column cell
+
+      // Create image elements for each symbol
+      const img1 = document.createElement("img");
+      var index1 = ""
+      var index2 = ""
+      if (img1 < 10){
+        index1 = `0${int1}`
+      }
+      else {
+        index1 = `${int1}`
+      }
+
+      if (img1 < 10){
+        index2 = `0${int2}`
+      }
+      else {
+        index2 = `${int2}`
+      }
+
+
+
+      img1.src = `language_symbols/elvhastian_${index1}.svg`;
+      img1.alt = `Symbol ${int1}`;
+      img1.style.border = "1px solid black";
+      img1.style.margin = "5px";
+
+      const img2 = document.createElement("img");
+      img2.src = `path_to_directory/name_${index2}.svg`;
+      img2.alt = `Symbol ${int2}`;
+      img2.style.border = "1px solid black";
+      img2.style.margin = "5px";
+
+      // Append images to respective cells
+      cell1.appendChild(img1);
+      cell2.appendChild(img2);
+      });
+
+
+      // safe = symbols[loopnum] - 1;
+      // coordinate1 = Math.floor(safe / 16) + 1;
+      // coordinate2 = (safe % 16) + 1;
+      // document.getElementById("symbol1").src = "../assets/elvhastian_" + coordinate1 + ".svg";
+      // document.getElementById("symbol2").src = "../assets/elvhastian_" + coordinate2 + ".svg";
+      // //Link for getting game state
+      // const response = await fetch("/get_game_state/<game_room>")
+      //   .then(response => response.json())
+      //   .then((state) => {
+      //     if (!state.game_over) {
+      //       if (i >= 7) {
+      //         document.getElementById("gameover").style.display = "block";
+      //         document.getElementById("endgame").innerText = "You Win";
+      //       } else {
+      //         wait = 1000 * intervals[i];
+      //         i++;
+      //         SetTimeout(() => { gameloop() }, wait)
+      //       }
+      //     } else {
+      //       document.getElementById("gameover").style.display = "block";
+      //     }
+      //   })
     }
 
     connect();
