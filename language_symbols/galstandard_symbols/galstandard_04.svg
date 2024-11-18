@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="33.458923"
+   width="33.458931"
    height="32.154442"
-   viewBox="0 0 33.458923 32.154442"
+   viewBox="0 0 33.458931 32.154442"
    version="1.1"
    id="svg1"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,30 +13,27 @@
      id="defs1" />
   <g
      id="layer1"
-     transform="translate(-81.511556,-208.83162)">
+     transform="translate(-15.682368,-208.83162)">
     <g
-       id="g12">
+       id="g4">
       <circle
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
-         id="circle29"
-         cx="-109.89326"
-         cy="-235.54846"
-         r="4.07722"
-         transform="scale(-1)" />
+         id="circle11"
+         cx="20.759588"
+         cy="214.26923"
+         r="4.07722" />
       <circle
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
-         id="circle30"
-         cx="-86.588776"
-         cy="-235.90884"
-         r="4.07722"
-         transform="scale(-1)" />
+         id="circle12"
+         cx="44.064079"
+         cy="213.90884"
+         r="4.07722" />
       <circle
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.9;stroke-dasharray:none"
-         id="circle31"
-         cx="-86.588776"
-         cy="-213.90884"
-         r="4.07722"
-         transform="scale(-1)" />
+         id="circle13"
+         cx="44.064079"
+         cy="235.90884"
+         r="4.07722" />
     </g>
   </g>
 </svg>

@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="22.581638"
+   width="20.510664"
    height="56.770535"
-   viewBox="0 0 22.581638 56.770539"
+   viewBox="0 0 20.510664 56.770539"
    version="1.1"
    id="svg1"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,21 +13,17 @@
      id="defs1" />
   <g
      id="layer1"
-     transform="translate(-83.022264,-66.953445)">
+     transform="translate(-20.791202,-5.4534451)">
     <g
-       id="g13">
+       id="g1">
       <path
          style="font-variation-settings:'wght' 400;fill:#000000;stroke:#000000;stroke-width:2.925;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-         d="M 102.07136,68.395436 99.262106,122.28199 Z"
-         id="path5" />
+         d="M 39.840296,6.8954359 37.031044,60.78199 Z"
+         id="path1" />
       <path
          style="font-variation-settings:'wght' 400;fill:none;stroke:#000000;stroke-width:2.41348;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-         d="m 84.229004,94.131973 c 0,0 0.291691,-11.039212 3.414475,-17.24148 3.122784,-6.202268 11.460739,-8.461622 9.07666,1.647851"
-         id="path20" />
-      <path
-         style="font-variation-settings:'wght' 400;fill:#000000;stroke:#000000;stroke-width:1.05712;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-         d="m 105.07606,104.22126 -1.01529,19.4752 z"
-         id="path29" />
+         d="m 21.997942,32.631973 c 0,0 0.291691,-11.039212 3.414475,-17.24148 3.122784,-6.2022678 11.460739,-8.4616214 9.07666,1.647851"
+         id="path2" />
     </g>
   </g>
 </svg>
