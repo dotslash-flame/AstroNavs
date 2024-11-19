@@ -11,7 +11,9 @@ app.config["MOVE_DURATIONS"] = [5, 5, 5]  # Example move durations
 room = {
     "is_ready": True,
     "is_running": True,
-    "safe_coordinates": [(5, 1), (4, 5)]  # Example safe coordinates
+    "safe_coordinates": [(5, 1), (4, 5)],  # Example safe coordinates
+    "is_won" : False,
+    "current_move" : 0
 }
 
 current_move = 0

@@ -53,10 +53,23 @@ def add_safe_coordinates(room_id):
     if not coordinates:
         return "Missing safe_coordinates", 400
 
+    current_move = request.json.get("current_move")
+    if not current_move:
+        return "Missing current move", 400
+
     room["safe_coordinates"] = coordinates
     room["is_running"] = True
+    room["current_move"] = current_move
     return jsonify({"status": "success"})
 
+@game_bp.route("/set_timer_over/<room_id>", methods = ["GET"])
+def set_timer_over(room_id):
+    current_app.logger.debug(f"Game round timer ended for room: {room_id}")
+    
+    room = game_manager.game_rooms.get(room_id)
+    room["is_running"] = False
+
+    return jsonify({"status" : "success"})
 
 @game_bp.route("/get_game_state/<room_id>", methods=["GET"])
 def get_game_state(room_id):
