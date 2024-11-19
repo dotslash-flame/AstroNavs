@@ -32,8 +32,8 @@
     }
 
     #table1 {
-      height: 100%;
-      width: 100%;
+      height: 80%;
+      width: 80%;
       margin-left: 5%;
     }
 
@@ -66,80 +66,190 @@
 </head>
 
 <body>
+  <h2 style="text-align: center;">Your Symbols Are</h2>
   <div id="gameover">
     <h1 style="margin-top:5%;">GAME OVER</h1>
   </div>
-  <div style="height:100%;width:10px;position:fixed;background-color:black;margin-left:49%;"></div>
-  <div style="float:left">
     <table id="table1">
-      <tr>
-        <td style="text-align: center;">Your Symbols Are</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img id="symbol1" src=""></td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img id="symbol2" src=""></td>
-      </tr>
     </table>
-  </div>
-  <div style="float:right;text-align:center;height:90%;width:35%;margin-right:5%;">
-    <p>Elvhastian to Galstandard</p>
-    <div id="translationtable">
-      <img style="float:left" src="../assets/elvhastian.svg">
-      <img style="float:right" src="../assets/galstandard.svg ">
-      <span style="font-size:160px;">&rarr;</span>
-      <span style="font-size:160px;">&rarr;</span>
-    </div>
-  </div>
   <script>
 
     /*Not sure how the game rooms are assigned or how the clients are decided
     if /connect already needs the game rooms and clients to be decided?? I didn't
     understand the server code help*/
-    loopnum = 0;
-    intervals = [60, 45, 45, 30, 30, 30, 30, 30]
-    symbols = [];
+    let symbols = [];
+    let current_move = 0;
+    let game_over = false;
+    let prev_symbols = [];
+
+    const room_id = "101"
+
     //Link for connecting to the game
     async function connect() {
-      response = await fetch('/connect', {
+      response = await fetch('http://172.16.148.79:5000/connect', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/JSON'
         },
         body: JSON.stringify({
           client: 'a', //client
-          game_room: '101' //game room, change from hard coded to command line
-        })
+          game_room: room_id, //game room, change from hard coded to command line,
+        }),
+        mode: "cors"
       })
-        .then(() => gameloop())
+        gameLoop()
+    }
+
+    async function gameLoop() {
+      console.log("Entering Game loop")
+      while(game_over == false){
+          pollForCoordinates()
+          .then(() => addImagesCorrespondingToCoordinates())
+          .then(() => pollForGameState())
+          await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+
+  async function getGameState()
+    {
+      var response = await fetch(`http://172.16.148.79:5000/get_game_state/${room_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/JSON'
+        },
+        mode:"cors"
+      })
+
+      return response.json()
+    }
+
+    async function getCoordinates() {
+      data = await getGameState()
+      let safe_coordinates = data["safe_coordinates"]
+      if (safe_coordinates.length > 0)
+      {
+        current_move = data["current_move"]
+        if (areArraysEqual(symbols, safe_coordinates))
+          return false
+        symbols = safe_coordinates
+        return true
+      }
+      return false
     }
 
 
+    function displayGameOver() {
+      document.getElementById("gameover").style.display = "block";
+    }
 
-    async function gameloop() {
-      safe = symbols[loopnum] - 1;
-      coordinate1 = Math.floor(safe / 16) + 1;
-      coordinate2 = (safe % 16) + 1;
-      document.getElementById("symbol1").src = "../assets/elvhastian_" + coordinate1 + ".svg";
-      document.getElementById("symbol2").src = "../assets/elvhastian_" + coordinate2 + ".svg";
-      //Link for getting game state
-      const response = await fetch("/get_game_state/<game_room>")
-        .then(response => response.json())
-        .then((state) => {
-          if (!state.game_over) {
-            if (i >= 7) {
-              document.getElementById("gameover").style.display = "block";
-              document.getElementById("endgame").innerText = "You Win";
-            } else {
-              wait = 1000 * intervals[i];
-              i++;
-              SetTimeout(() => { gameloop() }, wait)
-            }
-          } else {
-            document.getElementById("gameover").style.display = "block";
+    async function pollForGameState() {
+      let interval = setInterval(async () => {
+        var state = await getGameState()
+        if (state["current_move"] != current_move){
+
+          if (!state["is_running"]){
+            displayGameOver()
+            clearInterval(interval)
+            game_over = true
+            return
           }
-        })
+          console.log("Game has moved to next round")
+          clearInterval(interval)
+        }
+      },
+      5000
+    )
+    }
+
+    async function pollForCoordinates() {
+      let intervalId = setInterval(async () => {
+        try{
+          if (await getCoordinates()) {
+            console.log("Received coordinates and coordintes have been stored")
+            clearInterval(intervalId)
+          }
+        }
+        catch(error){
+          console.error('Error fetching data:', error);
+        }
+      },
+      5000
+    )
+    }
+
+
+    function areArraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;  // Arrays with different lengths cannot be equal
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;  // Elements at the same index are not equal
+      }
+    }
+
+  return true;  // Arrays are equal if no differences are found
+  }
+
+    async function addImagesCorrespondingToCoordinates() {
+
+    if (areArraysEqual(symbols, prev_symbols))
+      return
+
+    const table = document.getElementById("table1"); // Create a new table
+    table.style.margin = "0 auto";
+    table.style.textAlign = "center";
+    
+    table.innerHTML = ""
+    // var newRow = table.insertRow()
+    // var newCell = newRow.insertCell(); // Insert a new cell in the row
+    // newCell.innerHTML = '<td style="text-align: center;">Your Symbols Are</td>'; 
+    // newCell.colspan = 2
+
+
+    symbols.forEach(([int1, int2]) => {
+      const row = table.insertRow(); // Create a new row
+      const cell1 = row.insertCell(); // Create first column cell
+      const cell2 = row.insertCell(); // Create second column cell
+
+      // Create image elements for each symbol
+      const img1 = document.createElement("img");
+      var index1 = ""
+      var index2 = ""
+      if (int1 < 10){
+        index1 = `0${int1}`
+      }
+      else {
+        index1 = `${int1}`
+      }
+
+      if (int1   < 10){
+        index2 = `0${int2}`
+      }
+      else {
+        index2 = `${int2}`
+      }
+      
+
+
+      img1.src = `../language_symbols/elvhastian_symbols/elvhastian_${index1}.svg`;
+      img1.alt = `Symbol ${int1}`;
+      img1.setAttribute("width", "200")
+      img1.setAttribute("height", "200")
+
+
+      const img2 = document.createElement("img");
+      img2.src = `../language_symbols/elvhastian_symbols/elvhastian_${index2}.svg`;
+      img2.alt = `Symbol ${int2}`;
+      img2.setAttribute("width", "200")
+      img2.setAttribute("height", "200")
+
+      // Append images to respective cells
+      cell1.appendChild(img1);
+      cell2.appendChild(img2);
+      });
+      prev_symbols = symbols
     }
 
     connect();
