@@ -27,14 +27,20 @@ canvas {
 
 #controls {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  /* Change to right-align */
   align-items: center;
   gap: 32px;
+  position: fixed;
+  /* or absolute, depending on your layout */
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 input {
   background: rgba(255, 255, 255, 0.8);
-  padding: 10px;
+  padding: 2px;
   border-radius: 5px;
   font-size: 16px;
 
@@ -50,7 +56,6 @@ input {
   image-rendering: pixelated;
   -ms-interpolation-mode: nearest-neighbor;
 
-  padding: 2px;
   border-bottom: 6px solid limegreen;
   border-top: 2px solid limegreen;
   border-left: 8px solid limegreen;
@@ -86,6 +91,7 @@ input {
     align-items: center;
     justify-content: center;
   }
+
   .inner-overlay {
     display: flex;
     flex-direction: column;
@@ -131,12 +137,15 @@ button:hover {
   0% {
     opacity: 0;
   }
+
   25% {
     opacity: 1;
   }
+
   75% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
