@@ -103,7 +103,7 @@
   </div>
   <script>
 
-    intervals = [60, 45, 45, 30, 30, 30, 30, 30]
+    intervals = [5, 45, 45, 30, 30, 30, 30, 30]
 
     const room_id = '101'
 
@@ -157,7 +157,7 @@
     function timer(time) {
       document.getElementById("time").innerText = time;
       time--;
-      if (time != 0) {
+      if (time != -1) {
         setTimeout(() => { timer(time) }, 1000)
       } else {
         onRoundComplete();
@@ -177,7 +177,9 @@
 
     async function onRoundComplete(){
       var response = await informTimerEnded()
-      var response = await pollNextRoundStart()
+      response = await pollNextRoundStart()
+
+      console.log(response)
       if (response["game_over"]){
         document.getElementById("gameover").style.display = "block";
 
@@ -198,10 +200,7 @@ async function pollNextRoundStart() {
   return new Promise((resolve, reject) => {
     let intervalState = setInterval(async () => {
       try {
-        response = {
-          game_over : false,
-          is_running : true
-        }
+        response = await getGameState()
         if (response["game_over"]) {
           clearInterval(intervalState);
           resolve(response);

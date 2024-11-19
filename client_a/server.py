@@ -16,24 +16,28 @@ room = {
     "current_move" : 0
 }
 
-current_move = 0
 
 @app.route('/connect', methods=['POST'])
 def connect():
-    print("Received request")
     return '', 200
 
 @app.route('/get_game_state/<room_no>', methods=['GET'])
 def get_game_state(room_no):
-    global current_move
     game_state = {
         "is_ready": room["is_ready"],
         "is_running": room["is_running"],
-        "current_move": current_move,
+        "current_move": room["current_move"],
         "safe_coordinates": room["safe_coordinates"],
-        "game_over": current_move >= len(current_app.config["MOVE_DURATIONS"]),
+        "game_over": True,
+        "is_won" : True
     }
+    print(game_state)
     return jsonify(game_state)
+
+@app.route("/set_timer_over/<room_id>")
+def set_timer_over(room_id):
+    room["is_running"] = False
+    return jsonify({"status" : "success"})
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)
