@@ -94,61 +94,151 @@
   <div style="float:right;text-align:center;height:90%;width:35%;margin-right:5%;">
     <p>Elvhastian to Galstandard</p>
     <div id="translationtable">
-      <img style="float:left" src="../assets/galstandard.svg ">
-      <img style="float:right" src="../assets/galstandard.svg ">
+      <img style="float:left" src="../language_symbols/elvhastian.svg ">
+      <img style="float:right" src="../language_symbols/galstandard.svg ">
       <span style="font-size:160px;">&rarr;</span>
       <span style="font-size:160px;">&rarr;</span>
 
     </div>
   </div>
   <script>
-    /*Not sure how the game rooms are assigned or how the clients are decided
-    if /connect already needs the game rooms and clients to be decided?? I didn't
-    understand the server code help*/
-    loopnum = 0;
+
     intervals = [60, 45, 45, 30, 30, 30, 30, 30]
+
+    const room_id = '101'
+
+    const serverIP = "172.16.148.79"
+
+    const serverPort = "5000"
+
     //Link for connecting to the game
     async function connect() {
-      response = await fetch('/connect', {
+      response = await fetch(`http://${serverIP}:${serverPort}/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/JSON'
         },
         body: JSON.stringify({
-          client: '', //client
-          game_room: '' //game room
-        })
+          client: 'b', //client
+          game_room: '101' //game room
+        }),
+        mode: "cors"
       })
-        .then(() => gameloop())
+        .then(() => pollGameStart())
     }
+
+    // Waits till the game is ready, which happens when is_running is set true by add coords done by c. Once game starts, timer starts
+    async function pollGameStart(){
+      let interval = setInterval(async () => {
+        var state = await getGameState()
+        if (state["is_running"]){
+          console.log("Game has started")
+          clearInterval(interval)
+          timer(intervals[0])
+        }
+      },
+      500
+    )
+    }
+
+    async function getGameState()
+    {
+      var response = await fetch(`http://${serverIP}:${serverPort}/get_game_state/${room_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/JSON'
+        },
+        mode:"cors"
+      })
+
+      return response.json()
+    }
+
     function timer(time) {
       document.getElementById("time").innerText = time;
       time--;
-      if (time != 0) {
+      if (time != -1) {
         setTimeout(() => { timer(time) }, 1000)
       } else {
-        gameloop();
+        onRoundComplete();
       }
     }
-    async function gameloop() {
-      //Link for getting game state
-      const response = await fetch("/get_game_state/<game_room>")
-        .then(response => response.json())
-        .then((state) => {
-          if (!state.game_over) {
-            if (i >= 7) {
-              document.getElementById("gameover").style.display = "block";
-              document.getElementById("endgame").innerText = "You Win";
-            } else {
-              wait = 1000 * intervals[i];
-              i++;
-              timer(wait);
-            }
-          } else {
-            document.getElementById("gameover").style.display = "block";
-          }
-        })
+
+    async function informTimerEnded(){
+      var response = await fetch(`http://${serverIP}:${serverPort}/set_timer_over/${room_id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/JSON'
+        },
+        mode:"cors"
+      })
+      return response.json()
     }
+
+    async function onRoundComplete(){
+      var response = await informTimerEnded()
+      response = await pollNextRoundStart()
+
+      console.log(response)
+      if (response["game_over"]){
+        document.getElementById("gameover").style.display = "block";
+
+        if (response["is_won"]){
+          document.getElementById("endgame").innerText = "You Win!";
+        }
+        else{
+          document.getElementById("endgame").innerText = "You Lose";
+        }
+      }
+      else if (response["is_running"]){
+        timer(intervals[response["current_move"]])
+      }
+
+    }
+
+async function pollNextRoundStart() {
+  return new Promise((resolve, reject) => {
+    let intervalState = setInterval(async () => {
+      try {
+        response = await getGameState()
+        if (response["game_over"]) {
+          clearInterval(intervalState);
+          resolve(response);
+        } else if (response["is_running"]) {
+          clearInterval(intervalState);
+          resolve(response);
+        }
+      } catch (error) {
+        clearInterval(intervalState);
+        reject(error);
+      }
+    }, 1000); 
+  });
+}
+
+
+
+
+
+    // async function gameloop() {
+    //   //Link for getting game state
+    //   const response = await getGameState()
+    //     .then((response_json) => {
+
+    //       if (!response_json["game_over"]) {
+    //         i = response_json["current_move"]
+    //         if (i >= 7) {
+    //           document.getElementById("gameover").style.display = "block";
+    //           document.getElementById("endgame").innerText = "You Win";
+    //         } else {
+    //           wait = intervals[i];
+    //           timer(wait);
+    //         }
+    //       } else {
+    //         document.getElementById("gameover").style.display = "block";
+    //       }
+    //     })
+    // }
 
     connect();
   </script>

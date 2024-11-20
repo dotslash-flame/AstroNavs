@@ -15,6 +15,7 @@ class GameRoomManager:
                 "is_running": False,
                 "start_time": None,
                 "current_move": 0,
+                "is_won" : False 
             }
         return self.game_rooms[room_id]
 
@@ -35,22 +36,13 @@ class GameRoomManager:
         room = self.game_rooms.get(room_id)
         if not room:
             return None
-
-        current_time = time.time()
-        elapsed_time = current_time - (room["start_time"] or current_time)
-
-        total_time = 0
-        current_move = 0
-        for i, duration in enumerate(current_app.config["MOVE_DURATIONS"]):
-            total_time += duration
-            if elapsed_time <= total_time:
-                current_move = i + 1
-                break
-
+        # let c just say what round it is when it sends coordinates
         return {
             "is_ready": room["is_ready"],
             "is_running": room["is_running"],
-            "current_move": current_move,
+            "current_move": room["current_move"],
             "safe_coordinates": room["safe_coordinates"],
-            "game_over": current_move >= len(current_app.config["MOVE_DURATIONS"]),
+            "game_over": room["game_over"],
+            "is_won" : room["is_won"],
+            "start_time" : room["start_time"]
         }
