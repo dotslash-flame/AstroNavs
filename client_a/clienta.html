@@ -68,7 +68,7 @@
 <body>
   <h2 style="text-align: center;">Your Symbols Are</h2>
   <div id="gameover">
-    <h1 style="margin-top:5%;">GAME OVER</h1>
+    <h1 id="endgame" style="margin-top:5%;">GAME OVER</h1>
   </div>
     <table id="table1">
     </table>
@@ -161,8 +161,15 @@
     }
 
 
-    function displayGameOver() {
+    function displayGameOver(is_won) {
       document.getElementById("gameover").style.display = "block";
+
+      if (is_won){
+        document.getElementById("endgame").innerText = "You Win!";
+      }
+      else{
+        document.getElementById("endgame").innerText = "You Lose";
+      }
     }
 
     async function pollForGameState() {
@@ -173,6 +180,7 @@
         if (state["current_move"] != current_move){
 
           if (state["game_over"]){
+            game_over = true
             displayGameOver(state["is_won"])
             clearInterval(interval)
             resolve()
