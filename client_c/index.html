@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Astro Nav</title>
-    <link rel="stylesheet" href="./styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="shortcut icon" href="/logo.png" type="image/x-icon" />
-  </head>
-  <body>
-    <div id="overlay">
-      <div class="inner-overlay">
-        <p>Welcome to the Game!</p>
-        <button id="startButton">Start Game</button>
-      </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astro Nav</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet" />
+  <link rel="shortcut icon" href="./public/assets/images/logo.png" type="image/x-icon" />
+</head>
+
+<body>
+  <div id="overlay">
+    <div class="inner-overlay">
+      <p>Welcome to the Game!</p>
+      <button id="startButton">Start Game</button>
     </div>
-    <div id="controls">
-      <input
-        id="coordinatesInput"
-        type="text"
-        placeholder="Enter coordinates (x,y)"
-      />
-      <span id="timerDisplay timer"></span>
-    </div>
-    <div
-      id="overlay"
-      style="
+  </div>
+  <div id="controls">
+    <input id="coordinatesInput" type="text" placeholder="Enter coordinates (x,y)" />
+    <span id="timerDisplay timer"></span>
+  </div>
+  <div id="overlay" style="
         display: none;
         text-align: center;
         background: rgba(0, 0, 0, 0.8);
@@ -42,11 +37,23 @@
         height: 100%;
         font-size: 36px;
         padding-top: 20%;
-      "
-    ></div>
-    <div id="round-overlay" style="display: none"></div>
+      "></div>
+  <div id="round-overlay" style="display: none"></div>
 
-    <canvas id="gameCanvas" width="640" height="640"></canvas>
-    <script src="./src/game.js"></script>
-  </body>
+  <button id="musicToggleBtn" style="
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    border-radius: 5px;
+">🎵 Music: Off</button>
+
+  <canvas id="gameCanvas" width="640" height="640"></canvas>
+  <script src="./src/game.js"></script>
+</body>
+
 </html>
