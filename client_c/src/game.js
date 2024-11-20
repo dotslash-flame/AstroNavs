@@ -1,63 +1,15 @@
-// Go Nuts Babe
+// Setting up the game canvas
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Create Canvas
-canvas.width = 640;
-canvas.height = 640;
-const gridSize = 16;
+canvas.width = 680;
+canvas.height = 680;
+const gridSize = 17;
 const cellSize = canvas.width / gridSize;
-
-//TODO: make these inputtable by command line
-const game_room = "101"
-
-const serverAddress = "192.168.0.175"
-
-const serverPort = "5101"
-
-
-var isGameReady = false
-var isGameOver = false
-
-
-// Audio
-const bgMusic = new Audio("client/public/assets/audio/bg.mp3");
-const errorSound = new Audio("client/public/assets/audio/error.mp3");
-const wrongMoveSound = new Audio("client/public/assets/audio/wrong-move.mp3");
-const moveSounds = [
-  new Audio("client/public/assets/audio/move.mp3"),
-  new Audio("client/public/assets/audio/move-2.mp3"),
-];
-const airstrikeSound = new Audio("client/public/assets/audio/airstrike.mp3");
-const airstrikeSoundNew = new Audio(
-  "client/public/assets/audio/airstrike-1.mp3"
-);
-bgMusic.loop = true;
-bgMusic.volume = 0.2;
 
 // Background Stars
 const starCount = 100;
 const stars = [];
-
-// Game State
-let safeCells = [];
-let dangerousCells = [];
-let player = { x: 7, y: 7 };
-let gameOver = false;
-
-// Timing
-const gameDuration = 5 * 60; // 5 minutes
-const moveDurations = [60, 45, 45, 30, 30, 30, 30, 30];
-let currentMoveIndex = 0;
-let currentMoveTime = moveDurations[currentMoveIndex];
-let gameTimeRemaining = gameDuration;
-
-// Timer Display
-const timerDisplay = document.createElement("div");
-timerDisplay.style.color = "white";
-timerDisplay.style.fontSize = "20px";
-timerDisplay.style.marginTop = "10px";
-document.body.appendChild(timerDisplay);
 
 // Create Stars
 function createStars() {
@@ -95,7 +47,10 @@ function drawStars() {
   ctx.shadowColor = "transparent";
 }
 
-// Generate safe and dangerous cells
+// Generate random safe co-ords
+let safeCells = [];
+let dangerousCells = [];
+
 function generateSafeCells(num = 5) {
   safeCells = [];
   dangerousCells = [];
@@ -116,58 +71,10 @@ function generateSafeCells(num = 5) {
       if (!safeCells.includes(cellKey)) dangerousCells.push(cellKey);
     }
   }
-  sendSafeCoordinatesToServer(safeCoords)
-  isGameReady = false
-  waitGameStart()
 }
 
-async function sendSafeCoordinatesToServer(safeCoords) {
-  if (safeCoords.length == 0)
-    return false
-  uri = `http://${serverAddress}:${serverPort}/add_safe_coordinates/${game_room}`
-  await fetch(uri, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/JSON'
-    },
-    body: JSON.stringify({
-      safe_coordinates: safeCoords
-    }),
-    credentials: 'include'
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json()
-      }
-      else {
-        console.error('Request failed with status:', response.status);
-        throw new Error('Failed to connect to server');
-      }
-    })
-}
-
-// Display Timer
-function drawTimer() {
-  if (gameTimeRemaining > 0 && currentMoveTime > 0) {
-    gameTimeRemaining -= 1 / 60;
-    currentMoveTime -= 1 / 60;
-  } else if (currentMoveIndex < moveDurations.length - 1) {
-    currentMoveIndex++;
-    currentMoveTime = moveDurations[currentMoveIndex];
-  } else {
-    console.log("game end");
-  }
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
-  timerDisplay.textContent = `Game Time: ${formatTime(
-    gameTimeRemaining
-  )} | Move Time: ${formatTime(currentMoveTime)}`;
-}
+// Player Rendering
+let player = { x: 8, y: 8 };
 
 // Create Player
 function drawPlayer() {
@@ -181,12 +88,58 @@ function drawPlayer() {
   ctx.shadowBlur = 0;
 }
 
+// AUDIO
+const bgMusic = new Audio("./public/assets/audio/bg.mp3");
+const errorSound = new Audio("./public/assets/audio/error.mp3");
+const wrongMoveSound = new Audio("./public/assets/audio/wrong-move.mp3");
+const moveSounds = [
+  new Audio("./public/assets/audio/move.mp3"),
+  new Audio("./public/assets/audio/move-2.mp3"),
+];
+const airstrikeSound = new Audio("./public/assets/audio/airstrike.mp3");
+const airstrikeSoundNew = new Audio(
+  "./public/assets/audio/airstrike-1.mp3"
+);
+
+mutedMusic = true;
+
+bgMusic.loop = true;
+bgMusic.volume = 0.2;
+bgMusic.muted = true;
+
+const button = document.getElementById("musicToggleBtn")
+button.addEventListener("click",
+  () => {
+    if (mutedMusic) {
+      mutedMusic = false;
+
+      bgMusic.muted = false;
+      button.innerHTML = "🎵 Music: On";
+
+      // Try to play bg music if not already playing
+      if (bgMusic.paused) {
+        bgMusic.play().catch(error => {
+          console.log("Error playing background music:", error);
+        });
+      }
+    } else {
+      mutedMusic = true;
+
+      bgMusic.muted = true;
+      button.innerHTML = "🎵 Music: Off";
+    }
+  }
+);
+
 // Random Sound for move
 function playRandomMoveSound() {
-  const sound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
-  sound.play();
+  if (!mutedMusic) {
+    const sound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
+    sound.play();
+  }
 }
 
+// FX
 // Create Explosion
 function showExplosion(x, y) {
   const centerX = x * cellSize + cellSize / 2;
@@ -246,10 +199,14 @@ function airStrike() {
   const playerPosition = `${player.x}-${player.y}`;
   if (dangerousCells.includes(playerPosition)) {
     showExplosion(player.x, player.y);
-    airstrikeSound.play();
+    if (!mutedMusic) {
+      airstrikeSound.play();
+    }
     endGame(false);
   } else {
-    airstrikeSoundNew.play();
+    if (!mutedMusic) {
+      airstrikeSoundNew.play();
+    }
     const numExplosions = 10;
     const explosionCoords = dangerousCells
       .sort(() => 0.5 - Math.random())
@@ -263,194 +220,117 @@ function airStrike() {
   }
 }
 
-// Game Loop
-function gameLoop() {
-  if (!gameOver) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawStars();
-    // drawGrid();
-    drawPlayer();
-    drawTimer();
-    requestAnimationFrame(gameLoop);
-  }
+// Networking
+// Link for connecting to the game
+const server_ip = '172.16.148.79'
+const server_port = 5000
+const room_id = 101
+
+const intervals = [5, 45, 45, 30, 30, 30, 30, 30]
+
+async function pollGameStart() {
+  let interval = setInterval(async () => {
+    var state = await getGameState()
+    if (state["is_running"]) {
+      console.log("Game has started")
+      clearInterval(interval)
+      timer(intervals[0])
+    }
+  }, 500
+  )
 }
 
-// Start Game
-function startGame() {
-  createStars();
-  generateSafeCells();
-  gameLoop();
-  bgMusic.play();
-
-  const totalGameDuration = 300; // 5 mins
-  const roundDurations = [60, 45, 45]; // First round: 60s, next two: 45s each
-  const defaultRoundDuration = 30; // All remaining rounds: 30s each
-  const timerElement = document.getElementById("timer");
-  const overlay = document.getElementById("overlay"); // Round change
-
-  let elapsedTime = 0;
-  let currentRound = 0;
-  let roundTimeLeft = roundDurations[currentRound] || defaultRoundDuration; // Initial round
-  let gameOver = false;
-
-  function showRoundOverlay(roundNumber) {
-    if (overlay && !gameOver) {
-      // Only show overlay if the game is not over
-      overlay.style.display = "block";
-      overlay.innerHTML = `<h1>Round ${roundNumber} Starting!</h1>`;
-      setTimeout(() => {
-        overlay.style.display = "none"; // Hide after 2sec
-      }, 2000);
-    }
-  }
-
-  function updateTimer() {
-    if (gameOver) return; // Stop the timer if game is over
-
-    if (timerElement) {
-      timerElement.textContent = `Round ${currentRound + 1
-        }, Time: ${roundTimeLeft}s`;
-    }
-
-    if (roundTimeLeft <= 0) {
-      airStrike(); // Airstrike at the end of the round
-      currentRound++;
-
-      if (elapsedTime >= totalGameDuration) {
-        endGame(false); // End the game if time runs out
-        return;
-      }
-
-      const nextRoundDuration =
-        roundDurations[currentRound] || defaultRoundDuration;
-
-      if (elapsedTime + nextRoundDuration > totalGameDuration) {
-        roundTimeLeft = totalGameDuration - elapsedTime; // Cap to remaining game time
-      } else {
-        roundTimeLeft = nextRoundDuration;
-      }
-
-      // Random SafeCells every round
-      generateSafeCells();
-      // Show overlay for new round only if the game is not over
-      const playerPosition = `${player.x}-${player.y}`;
-      if (safeCells.includes(playerPosition)) {
-        showRoundOverlay(currentRound + 1);
-      }
-    }
-
-    // Update time variables
-    roundTimeLeft--;
-    elapsedTime++;
-
-    if (elapsedTime >= totalGameDuration) {
-      endGame(true); // Player wins if they survive the total duration
-    }
-  }
-
-  // Start the game timer
-  showRoundOverlay(1); // Overlay for round 1
-  const timerInterval = setInterval(updateTimer, 1000);
-}
-
-//  Fuck the game
-function endGame(win) {
-  if (gameOver) return; // Prevent running multiple times
-
-  gameOver = true;
-  bgMusic.pause(); // Stop background music
-  bgMusic.currentTime = 0; // Reset the music
-  const overlay = document.getElementById("overlay");
-
-  if (overlay) {
-    overlay.style.display = "flex"; // Show overlay
-    overlay.innerHTML = win
-      ? "<h1>You Survived! You Win!</h1>"
-      : "<h1>Game Over! You Lost!</h1>";
-    overlay.innerHTML +=
-      '<button onclick="location.reload()">Restart Game</button>';
-  }
-
-  if (!win) {
-    airstrikeSound.play(); // Play airstrike sound if the player lost
-  }
-}
-
-// Very shitty design, ideally we don't let user click start game till it is ready
-async function waitGameStart() {
-  while (isGameReady === false) {
-    await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
-  }
-}
-
-async function connectToServer() {
-  uri = `http://${serverAddress}:${serverPort}/connect`
-  await fetch(uri, {
+async function connect() {
+  response = await fetch(`http://${server_ip}:${server_port}/connect`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/JSON'
     },
     body: JSON.stringify({
-      client: 'c',
-      game_room: game_room
+      client: 'c', // client
+      game_room: room_id, // game room, change from hard coded to command line,
     }),
+    mode: "cors"
+  }).then(() => pollGameStart())
+}
+
+async function sendSafeCoords() {
+  response = await fetch(`http://${server_ip}:${server_port}/add_safe_coordinates/${room_id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      'safe_coordinates': safeCells.map(pair => pair.split('-').map(Number)),
+      'current_move': 1   // TODO: keep a move counter that this will use
+    }),
+    mode: 'cors'
   })
-    .then(response => {
-      if (response.ok) {
-        return response.json()
-      }
-      else {
-        console.error('Request failed with status:', response.status);
-        throw new Error('Failed to connect to server');
-      }
-    })
+  return response.json()
 }
 
-io = require("socket.io")
-const socket = io.connect(`http://${serverAddress}:${serverPort}`)
 
-socket.on('all_clients_ready', (data, ackCallBack) => {
-  ackCallBack("Acknowledged")
-  isGameReady = true
-}
-)
+// Game Logic
+var isGameOver = false
 
-socket.on('game_start_c', (data, ackCallBack) => {
-  ackCallBack("Acknowledged")
-  isGameReady = true
-})
+function gameLoop() {
+  if (!isGameOver) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawStars();
+    drawPlayer();
+    requestAnimationFrame(gameLoop);
 
-document.getElementById("startButton").addEventListener("click", async function () {
-  const overlay = document.getElementById("overlay");
-
-  if (overlay) {
-    overlay.style.display = "none";
+    // TODO: add networking
   }
+}
 
-  //TODO: Maybe add some loading thing between connect and wait game start
-  connectToServer()
+function startGame() {
+  connect();
+  createStars();
 
-  await waitGameStart()
+  generateSafeCells();
 
-  startGame();
-});
+  sendSafeCoords();
+  gameLoop();
+}
 
-// Take Player Input
-document.getElementById("coordinatesInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    const [x, y] = e.target.value.split(",").map(Number);
-    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-      player.x = x;
-      player.y = y;
-      const cellKey = `${x}-${y}`;
-      if (dangerousCells.includes(cellKey)) {
-        wrongMoveSound.play();
+
+// game start UI interaction
+document.getElementById("startButton").addEventListener("click",
+  async () => {
+    const overlay = document.getElementById("overlay");
+    if (overlay) {
+      overlay.style.display = "none";
+    }
+    startGame();
+  }
+);
+
+document.getElementById("coordinatesInput").addEventListener("keydown",
+  (e) => {
+    if (e.key === "Enter") {
+      const [x, y] = e.target.value.split(",").map(Number);
+      if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+        player.x = x;
+        player.y = y;
+        const cellKey = `${x}-${y}`;
+
+        if (!mutedMusic) {
+          if (dangerousCells.includes(cellKey)) {
+            wrongMoveSound.play();
+          } else {
+            playRandomMoveSound();
+          }
+        }
+
+        e.target.value = "";
       } else {
-        playRandomMoveSound();
+
+        if (!mutedMusic) {
+          errorSound.play();
+        }
+
       }
-      e.target.value = "";
-    } else {
-      errorSound.play();
     }
   }
-});
+);
