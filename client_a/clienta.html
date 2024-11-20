@@ -68,7 +68,7 @@
 <body>
   <h2 style="text-align: center;">Your Symbols Are</h2>
   <div id="gameover">
-    <h1 style="margin-top:5%;">GAME OVER</h1>
+    <h1 id="endgame" style="margin-top:5%;">GAME OVER</h1>
   </div>
     <table id="table1">
     </table>
@@ -82,11 +82,15 @@
     let game_over = false;
     let prev_symbols = [];
 
+    const intervals = [10, 45, 45, 30, 30, 30, 30, 30]
+
+    const serverIP = "192.168.0.175"
     const room_id = "101"
+    const serverPort = "5000"
 
     //Link for connecting to the game
     async function connect() {
-      response = await fetch('http://172.16.148.79:5000/connect', {
+      response = await fetch(`http://${serverIP}:${serverPort}/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/JSON'
@@ -96,23 +100,42 @@
           game_room: room_id, //game room, change from hard coded to command line,
         }),
         mode: "cors"
-      })
-        gameLoop()
+      }).then(() => gameLoop())
     }
 
-    async function gameLoop() {
-      console.log("Entering Game loop")
-      while(game_over == false){
-          pollForCoordinates()
-          .then(() => addImagesCorrespondingToCoordinates())
-          .then(() => pollForGameState())
-          await new Promise(resolve => setTimeout(resolve, 5000));
+
+    async function gameLoop(){
+      while(!game_over){
+        await pollForCoordinates()
+        .then(() => addImagesCorrespondingToCoordinates())
+        .then(() => wait(intervals[current_move] - 2))
+        .then(() => pollForGameState()) 
       }
     }
 
+    async function wait(time) {
+      return new Promise (resolve => {
+        console.log("Waiting for move to terminate")
+        setTimeout(() => {
+          console.log("Move terminated")
+          resolve()
+        }, time * 1000)
+      }
+    )
+    }
+
+    // async function gameLoop() {
+    //   console.log("Entering Game loop")
+    //   while(game_over == false){
+    //       await pollForCoordinates()
+    //       .then(() => pollForGameState())
+    //       await new Promise(resolve => setTimeout(resolve, 5000));
+    //   }
+    // }
+
   async function getGameState()
     {
-      var response = await fetch(`http://172.16.148.79:5000/get_game_state/${room_id}`, {
+      var response = await fetch(`http://${serverIP}:${serverPort}/get_game_state/${room_id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/JSON'
@@ -138,43 +161,59 @@
     }
 
 
-    function displayGameOver() {
+    function displayGameOver(is_won) {
       document.getElementById("gameover").style.display = "block";
+
+      if (is_won){
+        document.getElementById("endgame").innerText = "You Win!";
+      }
+      else{
+        document.getElementById("endgame").innerText = "You Lose";
+      }
     }
 
     async function pollForGameState() {
+     return new Promise(resolve => {
+      console.log("Polling for game state")
       let interval = setInterval(async () => {
         var state = await getGameState()
         if (state["current_move"] != current_move){
 
-          if (!state["is_running"]){
-            displayGameOver()
-            clearInterval(interval)
+          if (state["game_over"]){
             game_over = true
-            return
+            displayGameOver(state["is_won"])
+            clearInterval(interval)
+            resolve()
           }
           console.log("Game has moved to next round")
+          game_over = false
           clearInterval(interval)
+          resolve()
         }
       },
-      5000
+      500
     )
+     })
     }
 
     async function pollForCoordinates() {
-      let intervalId = setInterval(async () => {
+
+      return new Promise(resolve => {
+        let intervalId = setInterval(async () => {
         try{
           if (await getCoordinates()) {
             console.log("Received coordinates and coordintes have been stored")
             clearInterval(intervalId)
+            resolve()
           }
         }
         catch(error){
           console.error('Error fetching data:', error);
         }
       },
-      5000
+      500
     )
+    })
     }
 
 
@@ -192,64 +231,64 @@
   return true;  // Arrays are equal if no differences are found
   }
 
-    async function addImagesCorrespondingToCoordinates() {
-
-    if (areArraysEqual(symbols, prev_symbols))
-      return
-
-    const table = document.getElementById("table1"); // Create a new table
-    table.style.margin = "0 auto";
-    table.style.textAlign = "center";
-    
-    table.innerHTML = ""
-    // var newRow = table.insertRow()
-    // var newCell = newRow.insertCell(); // Insert a new cell in the row
-    // newCell.innerHTML = '<td style="text-align: center;">Your Symbols Are</td>'; 
-    // newCell.colspan = 2
+    function addImagesCorrespondingToCoordinates() {
+      return new Promise(resolve => {
+        const table = document.getElementById("table1"); // Create a new table
+        table.style.margin = "0 auto";
+        table.style.textAlign = "center";
+        
+        table.innerHTML = ""
+        // var newRow = table.insertRow()
+        // var newCell = newRow.insertCell(); // Insert a new cell in the row
+        // newCell.innerHTML = '<td style="text-align: center;">Your Symbols Are</td>'; 
+        // newCell.colspan = 2
 
 
-    symbols.forEach(([int1, int2]) => {
-      const row = table.insertRow(); // Create a new row
-      const cell1 = row.insertCell(); // Create first column cell
-      const cell2 = row.insertCell(); // Create second column cell
+        symbols.forEach(([int1, int2]) => {
+          const row = table.insertRow(); // Create a new row
+          const cell1 = row.insertCell(); // Create first column cell
+          const cell2 = row.insertCell(); // Create second column cell
 
-      // Create image elements for each symbol
-      const img1 = document.createElement("img");
-      var index1 = ""
-      var index2 = ""
-      if (int1 < 10){
-        index1 = `0${int1}`
-      }
-      else {
-        index1 = `${int1}`
-      }
+          // Create image elements for each symbol
+          const img1 = document.createElement("img");
+          var index1 = ""
+          var index2 = ""
+          if (int1 < 10){
+            index1 = `0${int1}`
+          }
+          else {
+            index1 = `${int1}`
+          }
 
-      if (int1   < 10){
-        index2 = `0${int2}`
-      }
-      else {
-        index2 = `${int2}`
-      }
-      
-
-
-      img1.src = `../language_symbols/elvhastian_symbols/elvhastian_${index1}.svg`;
-      img1.alt = `Symbol ${int1}`;
-      img1.setAttribute("width", "200")
-      img1.setAttribute("height", "200")
+          if (int2   < 10){
+            index2 = `0${int2}`
+          }
+          else {
+            index2 = `${int2}`
+          }
+          
 
 
-      const img2 = document.createElement("img");
-      img2.src = `../language_symbols/elvhastian_symbols/elvhastian_${index2}.svg`;
-      img2.alt = `Symbol ${int2}`;
-      img2.setAttribute("width", "200")
-      img2.setAttribute("height", "200")
+          img1.src = `../language_symbols/elvhastian_symbols/elvhastian_${index1}.svg`;
+          img1.alt = `Symbol ${int1}`;
+          img1.setAttribute("width", "200")
+          img1.setAttribute("height", "200")
 
-      // Append images to respective cells
-      cell1.appendChild(img1);
-      cell2.appendChild(img2);
-      });
-      prev_symbols = symbols
+          const img2 = document.createElement("img");
+          img2.src = `../language_symbols/elvhastian_symbols/elvhastian_${index2}.svg`;
+
+
+          img2.alt = `Symbol ${int2}`;
+          img2.setAttribute("width", "200")
+          img2.setAttribute("height", "200")
+
+          // Append images to respective cells
+          cell1.appendChild(img1);
+          cell2.appendChild(img2);
+          });
+          prev_symbols = symbols
+          resolve()
+          })
     }
 
     connect();

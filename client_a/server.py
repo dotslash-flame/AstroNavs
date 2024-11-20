@@ -26,9 +26,9 @@ def get_game_state(room_no):
     game_state = {
         "is_ready": room["is_ready"],
         "is_running": room["is_running"],
-        "current_move": room["current_move"],
-        "safe_coordinates": room["safe_coordinates"],
-        "game_over": True,
+        "current_move": 2,
+        "safe_coordinates": [(10, 2), (11, 13)],
+        "game_over": False,
         "is_won" : True
     }
     print(game_state)
