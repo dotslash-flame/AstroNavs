@@ -1,13 +1,15 @@
 import queue
 from flask import Flask, render_template, Response
 from .utils import setup_logging, log_queue
+from flask_cors import CORS
+
 
 def create_app(config_object=None):
     app = Flask(__name__)
-    
     if config_object:
         app.config.from_object(config_object)
 
+    CORS(app, supports_credentials=True)
     # Setup logging
     setup_logging(app)
 
