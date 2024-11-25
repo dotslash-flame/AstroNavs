@@ -221,66 +221,199 @@ function airStrike() {
 }
 
 // Networking
-// Link for connecting to the game
 const server_ip = '172.16.148.79'
 const server_port = 5000
 const room_id = 101
 
 const intervals = [5, 45, 45, 30, 30, 30, 30, 30]
+let currentMove = 1;
+let gameOver = false;
 
 async function pollGameStart() {
-  let interval = setInterval(async () => {
-    var state = await getGameState()
-    if (state["is_running"]) {
-      console.log("Game has started")
-      clearInterval(interval)
-      timer(intervals[0])
-    }
-  }, 500
-  )
+  return new Promise((resolve) => {
+    let interval = setInterval(async () => {
+      var state = await getGameState()
+      if (state["is_running"]) {
+        console.log("Game has started")
+        clearInterval(interval)
+        startRound(intervals[0])
+        resolve()
+      }
+    }, 500)
+  })
 }
 
 async function connect() {
-  response = await fetch(`http://${server_ip}:${server_port}/connect`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/JSON'
-    },
-    body: JSON.stringify({
-      client: 'c', // client
-      game_room: room_id, // game room, change from hard coded to command line,
-    }),
-    mode: "cors"
-  }).then(() => pollGameStart())
+  try {
+    const response = await fetch(`http://${server_ip}:${server_port}/connect`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/JSON'
+      },
+      body: JSON.stringify({
+        client: 'c',
+        game_room: room_id,
+      }),
+      mode: "cors"
+    });
+    await pollGameStart();
+  } catch (error) {
+    console.error("Connection error:", error);
+  }
 }
 
 async function sendSafeCoords() {
-  response = await fetch(`http://${server_ip}:${server_port}/add_safe_coordinates/${room_id}`, {
+  try {
+    const response = await fetch(`http://${server_ip}:${server_port}/add_safe_coordinates/${room_id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'safe_coordinates': safeCells.map(pair => pair.split('-').map(Number)),
+        'current_move': currentMove
+      }),
+      mode: 'cors'
+    });
+    return response.json();
+  } catch (error) {
+    console.error("Error sending coordinates:", error);
+  }
+}
+
+async function getGameState() {
+  try {
+    const response = await fetch(`http://${server_ip}:${server_port}/get_game_state/${room_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/JSON'
+      },
+      mode: "cors"
+    });
+    return response.json();
+  } catch (error) {
+    console.error("Error getting game state:", error);
+  }
+}
+
+async function informTimerEnded() {
+  try {
+    const response = await fetch(`http://${server_ip}:${server_port}/set_timer_over/${room_id}`, {
+      method: 'GET',
+      mode: "cors"
+    });
+    return response.json();
+  } catch (error) {
+    console.error("Error informing timer end:", error);
+  }
+}
+
+async function pollNextRoundStart() {
+  return new Promise((resolve, reject) => {
+    let intervalState = setInterval(async () => {
+      try {
+        const response = await getGameState();
+        if (response["game_over"]) {
+          clearInterval(intervalState);
+          gameOver = true;
+          resolve(response);
+        } else if (response["is_running"]) {
+          clearInterval(intervalState);
+          resolve(response);
+        }
+      } catch (error) {
+        clearInterval(intervalState);
+        reject(error);
+      }
+    }, 1000);
+  });
+}
+
+async function startRound(duration) {
+  // Start countdown
+  let timeLeft = duration;
+  const timerInterval = setInterval(async () => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      await onRoundComplete();
+    }
+  }, 1000);
+}
+
+async function onRoundComplete() {
+  await informTimerEnded();
+  
+  // Trigger airstrike animation
+  airStrike();
+  
+  // Wait for airstrike animation and next round state
+  const [response] = await Promise.all([
+    pollNextRoundStart(),
+    new Promise(resolve => setTimeout(resolve, 2000)) // Wait for airstrike animation
+  ]);
+
+  if (response["game_over"]) {
+    endGame(response["is_won"]);
+  } else if (response["is_running"]) {
+    currentMove++;
+    generateSafeCells();
+    await sendSafeCoords();
+    await startRound(intervals[currentMove]);
+  }
+}
+
+function endGame(isWon) {
+  gameOver = true;
+  isGameOver = true;
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.color = 'white';
+  overlay.style.fontSize = '48px';
+  overlay.innerHTML = isWon ? 'YOU WIN!' : 'GAME OVER';
+  document.body.appendChild(overlay);
+}
+
+// Game Logic
+var isGameOver = false;
+
+async function updateGameState() {
+  const playerPosition = `${player.x}-${player.y}`;
+  const survived = safeCells.includes(playerPosition);
+  return await fetch(`http://${server_ip}:${server_port}/update_game_state/${room_id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      'safe_coordinates': safeCells.map(pair => pair.split('-').map(Number)),
-      'current_move': 1   // TODO: keep a move counter that this will use
+      'survived': survived,
+      'current_move': currentMove
     }),
     mode: 'cors'
-  })
-  return response.json()
+  });
 }
-
-
-// Game Logic
-var isGameOver = false
 
 function gameLoop() {
   if (!isGameOver) {
+    // Clear and redraw game state
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawStars();
     drawPlayer();
-    requestAnimationFrame(gameLoop);
 
-    // TODO: add networking
+    // Update game state based on player position
+    updateGameState().catch(error => {
+      console.error("Error updating game state:", error);
+    });
+
+    // Continue game loop
+    requestAnimationFrame(gameLoop);
   }
 }
 
