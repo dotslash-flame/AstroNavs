@@ -84,7 +84,7 @@
 
     const intervals = [10, 45, 45, 30, 30, 30, 30, 30]
 
-    const serverIP = "192.168.0.175"
+    const serverIP = "172.16.148.79"
     const room_id = "101"
     const serverPort = "5000"
 
@@ -108,14 +108,14 @@
       while(!game_over){
         await pollForCoordinates()
         .then(() => addImagesCorrespondingToCoordinates())
-        .then(() => wait(intervals[current_move] - 2))
+        .then(() => wait(intervals[current_move -1] - 2))
         .then(() => pollForGameState()) 
       }
     }
 
     async function wait(time) {
       return new Promise (resolve => {
-        console.log("Waiting for move to terminate")
+        console.log("Waiting for move to terminate for ", time, " seconds")
         setTimeout(() => {
           console.log("Move terminated")
           resolve()
@@ -149,7 +149,8 @@
     async function getCoordinates() {
       data = await getGameState()
       let safe_coordinates = data["safe_coordinates"]
-      if (safe_coordinates.length > 0)
+      try{
+        if (safe_coordinates.length > 0)
       {
         current_move = data["current_move"]
         if (areArraysEqual(symbols, safe_coordinates))
@@ -158,6 +159,10 @@
         return true
       }
       return false
+      }
+      catch(error){
+        console.error('Error fetching data:', error);
+      }
     }
 
 
@@ -177,14 +182,13 @@
       console.log("Polling for game state")
       let interval = setInterval(async () => {
         var state = await getGameState()
-        if (state["current_move"] != current_move){
-
-          if (state["game_over"]){
+        if (state["game_over"]){
             game_over = true
             displayGameOver(state["is_won"])
             clearInterval(interval)
             resolve()
           }
+        if (state["current_move"] != current_move){
           console.log("Game has moved to next round")
           game_over = false
           clearInterval(interval)

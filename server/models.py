@@ -15,6 +15,7 @@ class GameRoomManager:
                 "is_running": False,
                 "start_time": None,
                 "current_move": 0,
+                "game_over": False,
                 "is_won" : False 
             }
         return self.game_rooms[room_id]
@@ -28,6 +29,7 @@ class GameRoomManager:
 
         room["clients"][client] = (client_ip, client_port)
         if len(room["clients"]) == 3:
+            print("Room is ready")
             room["is_ready"] = True
             room["start_time"] = time.time()
         return True

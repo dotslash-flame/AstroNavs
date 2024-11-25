@@ -64,7 +64,7 @@ function generateSafeCells(num = 5) {
 
     if (!safeCoords.includes((x, y))) safeCoords.push((x, y))
   }
-
+  console.log("Safe Coords:", safeCells);
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
       const cellKey = `${x}-${y}`;
@@ -202,6 +202,7 @@ function airStrike() {
     if (!mutedMusic) {
       airstrikeSound.play();
     }
+    survived = false;
     endGame(false);
   } else {
     if (!mutedMusic) {
@@ -217,15 +218,18 @@ function airStrike() {
       const [x, y] = coord.split("-").map(Number);
       showExplosion(x, y);
     });
+    currentMove++;
   }
 }
 
 // Networking
 const server_ip = '172.16.148.79'
 const server_port = 5000
-const room_id = 101
+const room_id = "101"
 
-const intervals = [5, 45, 45, 30, 30, 30, 30, 30]
+let survived = true;
+
+const intervals = [10, 45, 45, 30, 30, 30, 30, 30]
 let currentMove = 1;
 let gameOver = false;
 
@@ -233,9 +237,11 @@ async function pollGameStart() {
   return new Promise((resolve) => {
     let interval = setInterval(async () => {
       var state = await getGameState()
-      if (state["is_running"]) {
+      if (state["is_ready"]) {
         console.log("Game has started")
         clearInterval(interval)
+        generateSafeCells()
+        await sendSafeCoords()
         startRound(intervals[0])
         resolve()
       }
@@ -254,7 +260,8 @@ async function connect() {
         client: 'c',
         game_room: room_id,
       }),
-      mode: "cors"
+      mode: "cors",
+      credentials: "include"
     });
     await pollGameStart();
   } catch (error) {
@@ -263,22 +270,25 @@ async function connect() {
 }
 
 async function sendSafeCoords() {
-  try {
-    const response = await fetch(`http://${server_ip}:${server_port}/add_safe_coordinates/${room_id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        'safe_coordinates': safeCells.map(pair => pair.split('-').map(Number)),
-        'current_move': currentMove
-      }),
-      mode: 'cors'
-    });
-    return response.json();
-  } catch (error) {
-    console.error("Error sending coordinates:", error);
-  }
+  return new Promise(async resolve =>{
+    try {
+      const response = await fetch(`http://${server_ip}:${server_port}/add_safe_coordinates/${room_id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'safe_coordinates': safeCells.map(pair => pair.split('-').map(Number)),
+          'current_move': currentMove
+        }),
+        mode: 'cors',
+        credentials : 'include'
+      });
+      resolve(response.json());
+    } catch (error) {
+      console.error("Error sending coordinates:", error);
+    }
+  })
 }
 
 async function getGameState() {
@@ -288,7 +298,8 @@ async function getGameState() {
       headers: {
         'Content-Type': 'application/JSON'
       },
-      mode: "cors"
+      mode: "cors",
+      credentials: "include"
     });
     return response.json();
   } catch (error) {
@@ -341,12 +352,30 @@ async function startRound(duration) {
   }, 1000);
 }
 
+async function waitForTimerToEnd() {
+  return new Promise(resolve =>  {
+    let interval = setInterval(async () => {
+      var state = await getGameState()
+      if (!state["is_running"]) {
+        clearInterval(interval)
+        resolve()
+      }
+    }, 500)
+  })
+}
+
 async function onRoundComplete() {
-  await informTimerEnded();
   
+  await waitForTimerToEnd();
+
   // Trigger airstrike animation
   airStrike();
   
+
+  updateGameState().catch(error => {
+    console.error("Error updating game state:", error);
+  });
+
   // Wait for airstrike animation and next round state
   const [response] = await Promise.all([
     pollNextRoundStart(),
@@ -356,7 +385,6 @@ async function onRoundComplete() {
   if (response["game_over"]) {
     endGame(response["is_won"]);
   } else if (response["is_running"]) {
-    currentMove++;
     generateSafeCells();
     await sendSafeCoords();
     await startRound(intervals[currentMove]);
@@ -385,8 +413,8 @@ function endGame(isWon) {
 var isGameOver = false;
 
 async function updateGameState() {
-  const playerPosition = `${player.x}-${player.y}`;
-  const survived = safeCells.includes(playerPosition);
+  // const playerPosition = `${player.x}-${player.y}`;
+  // const survived = safeCells.includes(playerPosition);
   return await fetch(`http://${server_ip}:${server_port}/update_game_state/${room_id}`, {
     method: 'POST',
     headers: {
@@ -400,31 +428,41 @@ async function updateGameState() {
   });
 }
 
-function gameLoop() {
-  if (!isGameOver) {
-    // Clear and redraw game state
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawStars();
-    drawPlayer();
-
-    // Update game state based on player position
-    updateGameState().catch(error => {
-      console.error("Error updating game state:", error);
-    });
-
-    // Continue game loop
-    requestAnimationFrame(gameLoop);
+function timer(time) {
+  document.getElementById("time").innerText = time;
+  time--;
+  if (time != -1) {
+    setTimeout(() => { timer(time) }, 1000)
   }
 }
 
+
+// function gameLoop() {
+//   if (!isGameOver) {
+//     // Clear and redraw game state
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     drawStars();
+//     drawPlayer();
+
+//     timer(intervals[currentMove] - 5);
+
+//     // Update game state based on player position
+//     updateGameState().catch(error => {
+//       console.error("Error updating game state:", error);
+//     });
+
+//     // Continue game loop
+//     requestAnimationFrame(gameLoop);
+//   }
+// // }
+
 function startGame() {
   connect();
-  createStars();
 
-  generateSafeCells();
+  // generateSafeCells();
 
-  sendSafeCoords();
-  gameLoop();
+  // sendSafeCoords();
+  // gameLoop();
 }
 
 
@@ -435,6 +473,10 @@ document.getElementById("startButton").addEventListener("click",
     if (overlay) {
       overlay.style.display = "none";
     }
+    createStars();
+    drawStars();
+    drawPlayer();
+
     startGame();
   }
 );
