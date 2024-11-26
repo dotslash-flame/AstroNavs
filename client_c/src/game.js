@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = 680;
 canvas.height = 680;
-const gridSize = 17;
+const gridSize = 16;
 const cellSize = canvas.width / gridSize;
 
 // Background Stars
