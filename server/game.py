@@ -109,3 +109,10 @@ def update_game_state(room_id):
     room["is_running"] = True   
 
     return jsonify({"status": "success"}), 200
+
+@game_bp.route("/reset_game/<room_id>", methods=["POST"])
+def reset_game(room_id):
+    current_app.logger.debug(f"Game reset requested for room: {room_id}")
+    room = game_manager.reset_room(room_id)
+
+    return jsonify({"status": "success"}), 200

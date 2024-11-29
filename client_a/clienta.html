@@ -60,6 +60,15 @@
       text-align: center;
       display: none;
     }
+    @keyframes flash {
+      0% { background-color: yellow; }
+      50% { background-color: red; }
+      100% { background-color: yellow; }
+    }
+
+    .flash {
+      animation: flash 1s ease-in-out;
+    }
   </style>
   <title>AstroNavs: Client A</title>
 </head>
@@ -188,6 +197,7 @@
           if (state["current_move"] != current_move) {
             console.log("Game has moved to next round")
             game_over = false
+            updateFlashingElement(`Round ${state["current_move"]}`)
             clearInterval(interval)
             resolve()
           }
@@ -197,6 +207,13 @@
       })
     }
 
+    function updateFlashingElement(newValue) {
+    const element = document.getElementById('flashingElement');
+    element.textContent = newValue;
+    element.classList.remove('flash');
+    void element.offsetWidth;  // Trigger reflow to restart the animation
+    element.classList.add('flash');
+}
     async function pollForCoordinates() {
 
       return new Promise(resolve => {

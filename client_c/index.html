@@ -51,9 +51,21 @@
     border: none;
     border-radius: 5px;
 ">🎵 Music: Off</button>
+  <div id="flashingElement">Round 1</div>
 
   <canvas id="gameCanvas" width="640" height="640"></canvas>
   <script src="./src/game.js"></script>
+  <style>
+    @keyframes flash {
+      0% { background-color: yellow; }
+      50% { background-color: red; }
+      100% { background-color: yellow; }
+    }
+
+    .flash {
+      animation: flash 1s ease-in-out;
+    }
+  </style>
 </body>
 
 </html>

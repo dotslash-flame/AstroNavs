@@ -70,8 +70,18 @@
       color: white;
       background-color: rgb(25, 25, 25)
     }
+
+    @keyframes flash {
+      0% { background-color: yellow; }
+      50% { background-color: red; }
+      100% { background-color: yellow; }
+    }
+
+    .flash {
+      animation: flash 1s ease-in-out;
+    }
   </style>
-  <title>AstroNavs: Client A</title>
+  <title>AstroNavs: Client B</title>
 </head>
 
 <body>
@@ -87,6 +97,11 @@
       <tr>
         <td style="text-align: center;">
           <p id="time"></p>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center;">
+          <div style="text-align: center;" id="flashingElement">Round 1</div>
         </td>
       </tr>
     </table>
@@ -191,10 +206,19 @@
         }
       }
       else if (response["is_running"]){
+      
         timer(intervals[response["current_move"]])
       }
-
+      updateFlashingElement(`Round ${response["current_move"]}`)
     }
+
+function updateFlashingElement(newValue) {
+    const element = document.getElementById('flashingElement');
+    element.textContent = newValue;
+    element.classList.remove('flash');
+    void element.offsetWidth;  // Trigger reflow to restart the animation
+    element.classList.add('flash');
+}
 
 async function pollNextRoundStart() {
   return new Promise((resolve, reject) => {

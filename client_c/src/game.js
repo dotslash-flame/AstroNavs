@@ -249,6 +249,14 @@ async function pollGameStart() {
   })
 }
 
+function updateFlashingElement(newValue) {
+  const element = document.getElementById('flashingElement');
+  element.textContent = newValue;
+  element.classList.remove('flash');
+  void element.offsetWidth;  // Trigger reflow to restart the animation
+  element.classList.add('flash');
+}
+
 async function connect() {
   try {
     const response = await fetch(`http://${server_ip}:${server_port}/connect`, {
@@ -385,6 +393,7 @@ async function onRoundComplete() {
   if (response["game_over"]) {
     endGame(response["is_won"]);
   } else if (response["is_running"]) {
+    updateFlashingElement(`Round ${response["current_move"]}`); 
     generateSafeCells();
     await sendSafeCoords();
     await startRound(intervals[currentMove]);
@@ -484,7 +493,7 @@ document.getElementById("startButton").addEventListener("click",
 document.getElementById("coordinatesInput").addEventListener("keydown",
   (e) => {
     if (e.key === "Enter") {
-      const [x, y] = e.target.value.split(",").map(Number);
+      let [x, y] = e.target.value.split(",").map(Number);
       x -= 1, y -= 1;
       if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
         player.x = x;

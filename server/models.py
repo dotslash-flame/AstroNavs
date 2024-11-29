@@ -34,6 +34,19 @@ class GameRoomManager:
             room["start_time"] = time.time()
         return True
 
+    def reset_room(self, room_id: str):
+        if room_id in self.game_rooms:
+           self.game_rooms[room_id] = {
+                "clients": {},
+                "safe_coordinates": None,
+                "is_ready": False,
+                "is_running": False,
+                "start_time": None,
+                "current_move": 0,
+                "game_over": False,
+                "is_won" : False 
+            }
+
     def get_game_state(self, room_id: str) -> dict:
         room = self.game_rooms.get(room_id)
         if not room:
