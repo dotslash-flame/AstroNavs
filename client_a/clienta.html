@@ -45,12 +45,11 @@
     }
 
     img {
-      height: auto;
-      height: 96.5%;
+      width: 200px;
+      height: 200px;
       border-style: solid;
       border-width: 1px;
       margin: auto;
-      /* I don't know how to scale SVGs :( */
     }
 
     #gameover {
@@ -70,8 +69,8 @@
   <div id="gameover">
     <h1 id="endgame" style="margin-top:5%;">GAME OVER</h1>
   </div>
-    <table id="table1">
-    </table>
+  <table id="table1">
+  </table>
   <script>
 
     /*Not sure how the game rooms are assigned or how the clients are decided
@@ -104,24 +103,24 @@
     }
 
 
-    async function gameLoop(){
-      while(!game_over){
+    async function gameLoop() {
+      while (!game_over) {
         await pollForCoordinates()
-        .then(() => addImagesCorrespondingToCoordinates())
-        .then(() => wait(intervals[current_move -1] - 2))
-        .then(() => pollForGameState()) 
+          .then(() => addImagesCorrespondingToCoordinates())
+          .then(() => wait(intervals[current_move - 1] - 2))
+          .then(() => pollForGameState())
       }
     }
 
     async function wait(time) {
-      return new Promise (resolve => {
+      return new Promise(resolve => {
         console.log("Waiting for move to terminate for ", time, " seconds")
         setTimeout(() => {
           console.log("Move terminated")
           resolve()
         }, time * 1000)
       }
-    )
+      )
     }
 
     // async function gameLoop() {
@@ -133,14 +132,13 @@
     //   }
     // }
 
-  async function getGameState()
-    {
+    async function getGameState() {
       var response = await fetch(`http://${serverIP}:${serverPort}/get_game_state/${room_id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/JSON'
         },
-        mode:"cors"
+        mode: "cors"
       })
 
       return response.json()
@@ -149,18 +147,17 @@
     async function getCoordinates() {
       data = await getGameState()
       let safe_coordinates = data["safe_coordinates"]
-      try{
-        if (safe_coordinates.length > 0)
-      {
-        current_move = data["current_move"]
-        if (areArraysEqual(symbols, safe_coordinates))
-          return false
-        symbols = safe_coordinates
-        return true
+      try {
+        if (safe_coordinates.length > 0) {
+          current_move = data["current_move"]
+          if (areArraysEqual(symbols, safe_coordinates))
+            return false
+          symbols = safe_coordinates
+          return true
+        }
+        return false
       }
-      return false
-      }
-      catch(error){
+      catch (error) {
         console.error('Error fetching data:', error);
       }
     }
@@ -169,130 +166,102 @@
     function displayGameOver(is_won) {
       document.getElementById("gameover").style.display = "block";
 
-      if (is_won){
+      if (is_won) {
         document.getElementById("endgame").innerText = "You Win!";
       }
-      else{
+      else {
         document.getElementById("endgame").innerText = "You Lose";
       }
     }
 
     async function pollForGameState() {
-     return new Promise(resolve => {
-      console.log("Polling for game state")
-      let interval = setInterval(async () => {
-        var state = await getGameState()
-        if (state["game_over"]){
+      return new Promise(resolve => {
+        console.log("Polling for game state")
+        let interval = setInterval(async () => {
+          var state = await getGameState()
+          if (state["game_over"]) {
             game_over = true
             displayGameOver(state["is_won"])
             clearInterval(interval)
             resolve()
           }
-        if (state["current_move"] != current_move){
-          console.log("Game has moved to next round")
-          game_over = false
-          clearInterval(interval)
-          resolve()
-        }
-      },
-      500
-    )
-     })
+          if (state["current_move"] != current_move) {
+            console.log("Game has moved to next round")
+            game_over = false
+            clearInterval(interval)
+            resolve()
+          }
+        },
+          500
+        )
+      })
     }
 
     async function pollForCoordinates() {
 
       return new Promise(resolve => {
         let intervalId = setInterval(async () => {
-        try{
-          if (await getCoordinates()) {
-            console.log("Received coordinates and coordintes have been stored")
-            clearInterval(intervalId)
-            resolve()
+          try {
+            if (await getCoordinates()) {
+              console.log("Received coordinates and coordintes have been stored")
+              clearInterval(intervalId)
+              resolve()
+            }
           }
-        }
-        catch(error){
-          console.error('Error fetching data:', error);
-        }
-      },
-      500
-    )
-    })
+          catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        },
+          500
+        )
+      })
     }
 
 
     function areArraysEqual(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-      return false;  // Arrays with different lengths cannot be equal
-    }
-
-    for (let i = 0; i < arr1.length; i++) {
-      if (arr1[i] !== arr2[i]) {
-        return false;  // Elements at the same index are not equal
+      if (arr1.length !== arr2.length) {
+        return false;  // Arrays with different lengths cannot be equal
       }
-    }
 
-  return true;  // Arrays are equal if no differences are found
-  }
+      for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) {
+          return false;  // Elements at the same index are not equal
+        }
+      }
+
+      return true;  // Arrays are equal if no differences are found
+    }
 
     function addImagesCorrespondingToCoordinates() {
       return new Promise(resolve => {
-        const table = document.getElementById("table1"); // Create a new table
+        const table = document.getElementById("table1");
         table.style.margin = "0 auto";
         table.style.textAlign = "center";
-        
-        table.innerHTML = ""
-        // var newRow = table.insertRow()
-        // var newCell = newRow.insertCell(); // Insert a new cell in the row
-        // newCell.innerHTML = '<td style="text-align: center;">Your Symbols Are</td>'; 
-        // newCell.colspan = 2
 
+        table.innerHTML = ""
 
         symbols.forEach(([int1, int2]) => {
-          const row = table.insertRow(); // Create a new row
-          const cell1 = row.insertCell(); // Create first column cell
-          const cell2 = row.insertCell(); // Create second column cell
+          const row = table.insertRow();
+          const cell1 = row.insertCell();
+          const cell2 = row.insertCell();
 
-          // Create image elements for each symbol
           const img1 = document.createElement("img");
-          var index1 = ""
-          var index2 = ""
-          if (int1 < 10){
-            index1 = `0${int1}`
-          }
-          else {
-            index1 = `${int1}`
-          }
-
-          if (int2   < 10){
-            index2 = `0${int2}`
-          }
-          else {
-            index2 = `${int2}`
-          }
-          
-
+          var index1 = int1 < 10 ? `0${int1}` : `${int1}`;
+          var index2 = int2 < 10 ? `0${int2}` : `${int2}`;
 
           img1.src = `../language_symbols/elvhastian_symbols/elvhastian_${index1}.svg`;
-          img1.alt = `Symbol ${int1}`;
-          img1.setAttribute("width", "200")
-          img1.setAttribute("height", "200")
+          // img1.alt = `Symbol ${int1}`;
 
           const img2 = document.createElement("img");
           img2.src = `../language_symbols/elvhastian_symbols/elvhastian_${index2}.svg`;
+          // img2.alt = `Symbol ${int2}`;
 
-
-          img2.alt = `Symbol ${int2}`;
-          img2.setAttribute("width", "200")
-          img2.setAttribute("height", "200")
-
-          // Append images to respective cells
           cell1.appendChild(img1);
           cell2.appendChild(img2);
-          });
-          prev_symbols = symbols
-          resolve()
-          })
+        });
+        prev_symbols = symbols
+        resolve()
+      })
     }
 
     connect();
