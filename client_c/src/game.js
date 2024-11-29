@@ -485,11 +485,14 @@ document.getElementById("coordinatesInput").addEventListener("keydown",
   (e) => {
     if (e.key === "Enter") {
       const [x, y] = e.target.value.split(",").map(Number);
+      x -= 1, y -= 1;
       if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
         player.x = x;
         player.y = y;
         const cellKey = `${x}-${y}`;
-
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawStars();
+        drawPlayer();
         if (!mutedMusic) {
           if (dangerousCells.includes(cellKey)) {
             wrongMoveSound.play();
