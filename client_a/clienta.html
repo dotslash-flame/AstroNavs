@@ -219,18 +219,22 @@
 
 
     function areArraysEqual(arr1, arr2) {
-      if (arr1.length !== arr2.length) {
+    if (arr1.length !== arr2.length) {
         return false;  // Arrays with different lengths cannot be equal
-      }
-
-      for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) {
-          return false;  // Elements at the same index are not equal
-        }
-      }
-
-      return true;  // Arrays are equal if no differences are found
     }
+
+    for (let i = 0; i < arr1.length; i++) {
+        if (Array.isArray(arr1[i]) && Array.isArray(arr2[i])) {
+            if (!areArraysEqual(arr1[i], arr2[i])) {
+                return false;  // Nested arrays are not equal
+            }
+        } else if (arr1[i] !== arr2[i]) {
+            return false;  // Elements at the same index are not equal
+        }
+    }
+
+    return true;  // All elements are equal
+}
 
     function addImagesCorrespondingToCoordinates() {
       return new Promise(resolve => {
