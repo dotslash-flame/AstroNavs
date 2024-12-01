@@ -60,6 +60,15 @@
       text-align: center;
       display: none;
     }
+    @keyframes flash {
+      0% { background-color: yellow; }
+      50% { background-color: red; }
+      100% { background-color: yellow; }
+    }
+
+    .flash {
+      animation: flash 1s ease-in-out;
+    }
   </style>
   <title>AstroNavs: Client A</title>
 </head>
@@ -81,7 +90,7 @@
     let game_over = false;
     let prev_symbols = [];
 
-    const intervals = [10, 45, 45, 30, 30, 30, 30, 30]
+    const intervals = [60, 45, 45, 30, 30, 30, 30, 30]
 
     const serverIP = "172.16.148.79"
     const room_id = "101"
@@ -188,6 +197,7 @@
           if (state["current_move"] != current_move) {
             console.log("Game has moved to next round")
             game_over = false
+            updateFlashingElement(`Round ${state["current_move"]}`)
             clearInterval(interval)
             resolve()
           }
@@ -197,6 +207,13 @@
       })
     }
 
+    function updateFlashingElement(newValue) {
+    const element = document.getElementById('flashingElement');
+    element.textContent = newValue;
+    element.classList.remove('flash');
+    void element.offsetWidth;  // Trigger reflow to restart the animation
+    element.classList.add('flash');
+}
     async function pollForCoordinates() {
 
       return new Promise(resolve => {
@@ -248,7 +265,8 @@
           const row = table.insertRow();
           const cell1 = row.insertCell();
           const cell2 = row.insertCell();
-
+          int1 = int1 + 1;
+          int2 = int2 + 1;
           const img1 = document.createElement("img");
           var index1 = int1 < 10 ? `0${int1}` : `${int1}`;
           var index2 = int2 < 10 ? `0${int2}` : `${int2}`;
