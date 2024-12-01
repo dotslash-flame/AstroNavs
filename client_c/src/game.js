@@ -229,7 +229,7 @@ const room_id = "101"
 
 let survived = true;
 
-const intervals = [10, 45, 45, 30, 30, 30, 30, 30]
+const intervals = [60, 45, 45, 30, 30, 30, 30, 30]
 let currentMove = 1;
 let gameOver = false;
 
